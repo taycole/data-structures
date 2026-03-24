@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 // Gets the number of elements in an array
 #define NELEMS(x) (sizeof(x) / sizeof((x)[0]))
@@ -20,7 +21,7 @@ struct min_max get_min_max(int *arr, int len);
 char **fizz_buzz(int *arr, int len);
 void free_fizzbuzz(char **ptr_arr, int len);
 void reverse(int *arr, int len);
-
+int *rotate(int *arr, int len, int steps);
 
 // Used to test out the functions
 int main()
@@ -65,8 +66,19 @@ int main()
     print_int_array(rev_test, 6);
     // -----------------------------------------------------------------------
     // rotate tests
-    printf("\nrotate example 1");
+    printf("\nrotate example 1\n");
+    int rotate_test[] = {-20, -13, -6, 1, 8, 15};
+    print_int_array(rotate_test, 6);
+    int steps[] = {1, 2, 0, -1, -2, 28, -100, pow(2, 28), -pow(2, 28)};
     
+    for (int i = 0; i < 9; i++) {
+        int *rotated_arr = rotate(rotate_test, 6, steps[i]);
+	printf("Steps: %d ", steps[i]);
+        print_int_array(rotated_arr, 6);
+	free(rotated_arr);
+    }
+    print_int_array(rotate_test, 6);
+    // -----------------------------------------------------------------------
     
     
     return 0;
@@ -168,4 +180,31 @@ void reverse(int *arr, int len)
         arr[i] = arr[len - 1 - i];
 	arr[len - 1 - i] = tmp;
     }
+}
+
+/**
+ * Shifts values of the given integer array a number of steps left or right
+ *
+ * @param arr: Array of ints to be rotated
+ * @param len: Length of the given array
+ * @param steps: Positive or negative int
+ *
+ * returns: New array containing the rotated values.
+ */
+int *rotate(int *arr, int len, int steps)
+{
+    int *new_arr = calloc(len, sizeof(int));
+    
+    // First adjusts number of steps to its smaller equivalent
+    // 14 steps equivalent to 2 steps for array length 6, etc.
+    int adj_steps = abs(steps) % len;
+
+    // Converts negative steps to positive equivalent (2 left = 4 right)
+    if (steps < 0)
+        adj_steps = len - adj_steps;
+
+    for (int i = 0; i < len; i++)
+	new_arr[((i + adj_steps) % len)] = arr[i];
+
+    return new_arr;
 }
