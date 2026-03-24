@@ -1,1 +1,1 @@
-Basic data structure in C. Adapted from CS261 notes.
+Basic data structures in C. Adapted from CS261 notes.
