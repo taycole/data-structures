@@ -22,6 +22,8 @@ char **fizz_buzz(int *arr, int len);
 void free_fizzbuzz(char **ptr_arr, int len);
 void reverse(int *arr, int len);
 int *rotate(int *arr, int len, int steps);
+int *sa_range(int start, int end);
+int is_int_sorted(int *arr, int len);
 
 // Used to test out the functions
 int main()
@@ -79,6 +81,47 @@ int main()
     }
     print_int_array(rotate_test, 6);
     // -----------------------------------------------------------------------
+    // sa_range tests
+    printf("\nsa_range tests\n");
+    int cases[] = {1, 3, -1, 2, 0, 0, 0, -3, -95, -89, -89, -95};
+    for (int i = 0; i < 12; i += 2) {
+	printf("%d to %d:  ", cases[i], cases[i+1]);
+        int *sa_arr = sa_range(cases[i], cases[i+1]);
+        print_int_array(sa_arr, (abs(cases[i] - cases[i + 1]) + 1));
+	free(sa_arr);
+    }
+    // -----------------------------------------------------------------------
+    // is_int_sorted
+    printf("\nis_int_sorted tests\n");
+    int sort_test1[] = {-100, -8, 0, 2, 3, 10, 20, 100};
+    int sort_test2[] = {1, 3, -10, 20, -30, 0};
+    int sort_test3[] = {-10, 0, 0, 10, 20, 30};
+    int sort_test4[] = {100, 90, 0, -90, -200};
+    int sort_test5[] = {35730,  77423, 66302,  -10656, 44764,
+                        -81911, 19699, -89130, -45360};
+    int str_sort_test1[] = {'A', 'B', 'Z', 'a', 'z'};
+    int str_sort_test2[] = {'Z', 'T', 'K', 'A', '5'};
+    int str_sort_test3[] = {'a', 'p', 'p', 'l', 'e'};
+    int *sort_test_cases[] = {sort_test1,     sort_test2,    sort_test3,
+                              sort_test4,     sort_test5,    str_sort_test1,
+                              str_sort_test2, str_sort_test3};
+    int sort_test_lens[] = {8, 6, 6, 5, 9, 5, 5, 5, 5};
+
+    printf("problem child: ");
+    print_int_array(str_sort_test2, 5);
+    printf("  Result: %d\n\n", is_int_sorted(str_sort_test2, 5));
+
+    
+    int i = 0;
+    for (i = 0; i < 8; i++) {
+        printf("Checking: ");
+        print_int_array(sort_test_cases[i], sort_test_lens[i]);
+        printf("  Result: %d",
+               is_int_sorted(sort_test_cases[i], sort_test_lens[i]));
+	printf("\n");
+    }
+
+    
     
     
     return 0;
@@ -207,4 +250,65 @@ int *rotate(int *arr, int len, int steps)
 	new_arr[((i + adj_steps) % len)] = arr[i];
 
     return new_arr;
+}
+
+/**
+ * Creates an array containing all values between two integers (inclusive)
+ *
+ * @param start: Int start point
+ * @param end:   Int end point
+ *
+ * returns: Int array containing the range of values
+ */
+int *sa_range(int start, int end)
+{
+    // Negative increment if end < start
+    int n = (end < start) ? -1 : 1;
+
+    // Initializes array with start and end values
+    int arr_len = (abs(start - end) + 1);
+    int *arr = calloc(arr_len, sizeof(int));
+    arr[0] = start;
+    arr[arr_len - 1] = end;
+
+    // Fills in the middle values
+    for (int i = 1; i < arr_len - 1; i++) {
+	arr[i] = start + n * i;
+    }
+    return arr;
+}
+
+/**
+ * Checks if the given integer array is strictly ascending, descending or
+ * neither.
+ *
+ * @param arr: Array of integers
+ * @param len: Length of array
+ *
+ * returns: 1 if strictly ascending, -1 for descending, 0 for neither
+ */
+int is_int_sorted(int *arr, int len)
+{
+    // One element considered strictly ascending
+    if (len == 1)
+        return 1;
+    // If start and end equal, must be neither
+    if (arr[0] == arr[len - 1])
+        return 0;
+    // Array order indicators. 1 for ascending, -1 for descending
+    int arr_order = (arr[0] < arr[len - 1]) ? 1 : -1;
+
+    // Check remaining values between first and last index
+    for (int i = 1; i < len / 2; i++) {
+        // Adjacent values equal? return 0
+        if (arr[i - 1] == arr[i] || arr[len - i] == arr[len - 1 - i])
+            return 0;
+
+	// This shit is fucked-------------------------------
+        // Breaks loop if expected order incorrent
+        if ((arr_order == 1 && !(arr[i - 1] < arr[i] < arr[len - 1 - i])) ||
+            (arr_order == -1 && !(arr[i - 1] > arr[i] > arr[len - 1 - i])))
+	    return 0;
+    }
+    return arr_order;
 }
