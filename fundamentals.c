@@ -304,10 +304,9 @@ int is_int_sorted(int *arr, int len)
         if (arr[i - 1] == arr[i] || arr[len - i] == arr[len - 1 - i])
             return 0;
 
-	// This shit is fucked-------------------------------
         // Breaks loop if expected order incorrent
-        if ((arr_order == 1 && !(arr[i - 1] < arr[i] < arr[len - 1 - i])) ||
-            (arr_order == -1 && !(arr[i - 1] > arr[i] > arr[len - 1 - i])))
+        if ((arr_order == 1 && (arr[i - 1] >= arr[i])) ||
+            (arr_order == -1 && (arr[i - 1] <= arr[i])))
 	    return 0;
     }
     return arr_order;
