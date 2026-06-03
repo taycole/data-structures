@@ -1,5 +1,5 @@
 /* Static array fundamentals.
-   Implements 10 functions that manipulate an array.
+ * Implements 10 functions that manipulate an array.
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,23 +7,49 @@
 #include <math.h>
 
 // Gets the number of elements in an array
-#define NELEMS(x) (sizeof(x) / sizeof((x)[0]))
+#define NELEMS(arr) (sizeof(arr) / sizeof(*arr))
 
 // Structs
 struct min_max {
     int min, max;
 };
 
+typedef struct Int_Arr {
+    int count;
+    int data[32];
+} Int_Arr;
+
+typedef struct Int_Mode {
+    int count;
+    int mode;
+} Int_Mode;
+
+typedef struct Str_Mode {
+    int count;
+    char* mode;
+} Str_Mode;
+
+
 // Function declarations
 void print_int_array(int *arr, int len);
 void print_str_array(char **arr, int len);
+
 struct min_max get_min_max(int *arr, int len);
+
 char **fizz_buzz(int *arr, int len);
 void free_fizzbuzz(char **ptr_arr, int len);
+
 void reverse(int *arr, int len);
 int *rotate(int *arr, int len, int steps);
 int *sa_range(int start, int end);
 int is_int_sorted(int *arr, int len);
+
+Int_Mode int_find_mode(int *arr, int len);
+Str_Mode str_find_mode(char** arr, int len);
+
+int* remove_duplicates(int* arr, int len);
+
+int* count_sort(int* arr, int len);
 
 // Used to test out the functions
 int main()
@@ -47,6 +73,7 @@ int main()
         result = get_min_max(test_cases[i], test_lens[i]);
         printf("Min: %d, Max: %d\n", result.min, result.max);
     }
+    
     // -----------------------------------------------------------------------
     // fizz_buzz test
     printf("\nfizz_buzz test:\n");
@@ -57,6 +84,7 @@ int main()
     print_int_array(fb_test, 7);
 
     free_fizzbuzz(fizzbuzzed, 7);
+    
     // -----------------------------------------------------------------------
     // array reverse example 1
     printf("\nreverse test:\n");
@@ -66,6 +94,7 @@ int main()
     print_int_array(rev_test, 6);
     reverse(rev_test, 6);
     print_int_array(rev_test, 6);
+    
     // -----------------------------------------------------------------------
     // rotate tests
     printf("\nrotate example 1\n");
@@ -80,6 +109,7 @@ int main()
 	free(rotated_arr);
     }
     print_int_array(rotate_test, 6);
+    
     // -----------------------------------------------------------------------
     // sa_range tests
     printf("\nsa_range tests\n");
@@ -99,6 +129,7 @@ int main()
     int sort_test4[] = {100, 90, 0, -90, -200};
     int sort_test5[] = {35730,  77423, 66302,  -10656, 44764,
                         -81911, 19699, -89130, -45360};
+    
     int str_sort_test1[] = {'A', 'B', 'Z', 'a', 'z'};
     int str_sort_test2[] = {'Z', 'T', 'K', 'A', '5'};
     int str_sort_test3[] = {'a', 'p', 'p', 'l', 'e'};
@@ -107,20 +138,66 @@ int main()
                               str_sort_test2, str_sort_test3};
     int sort_test_lens[] = {8, 6, 6, 5, 9, 5, 5, 5, 5};
 
-    printf("problem child: ");
-    print_int_array(str_sort_test2, 5);
-    printf("  Result: %d\n\n", is_int_sorted(str_sort_test2, 5));
-
-    
-    int i = 0;
-    for (i = 0; i < 8; i++) {
+    for (int i = 0; i < 8; i++) {
         printf("Checking: ");
         print_int_array(sort_test_cases[i], sort_test_lens[i]);
         printf("  Result: %d",
                is_int_sorted(sort_test_cases[i], sort_test_lens[i]));
 	printf("\n");
     }
+    // -----------------------------------------------------------------------
+    // find_mode
+    int find_mode_test1[] = {1, 20, 30, 40, 500, 500, 500};
+    Int_Mode run_test1 = int_find_mode(find_mode_test1, NELEMS(find_mode_test1));
+    int find_mode_test2[] = {2, 2, 2, 2, 1, 1, 1, 1};
+    Int_Mode run_test2 = int_find_mode(find_mode_test2, NELEMS(find_mode_test2));
+    char* find_mode_test3[] = {"zebra", "sloth", "otter", "otter", "moose", "koala"};
+    Str_Mode run_test3 = str_find_mode(find_mode_test3, NELEMS(find_mode_test3));
+    char* find_mode_test4[] = {"Albania", "Belgium", "Chile", "Denmark", "Egypt", "Fiji"};
+    Str_Mode run_test4 = str_find_mode(find_mode_test4, NELEMS(find_mode_test4));
 
+    printf("Mode: %d, Frequency: %d\n", run_test1.mode, run_test1.count);
+    printf("Mode: %d, Frequency: %d\n", run_test2.mode, run_test2.count);
+    printf("Mode: %s, Frequency: %d\n", run_test3.mode, run_test3.count);
+    printf("Mode: %s, Frequency: %d\n", run_test4.mode, run_test4.count);
+    printf("\n");
+    
+    // -----------------------------------------------------------------------
+    // remove_duplicates
+    Int_Arr rm_dup_test1 = {.count = 1, .data = {1}},
+	    rm_dup_test2 = {.count = 2, .data = {1, 2}},
+	    rm_dup_test3 = {.count = 3, .data = {1, 1, 2}},
+	    rm_dup_test4 = {.count = 7, .data = {1, 20, 30, 40, 500, 500, 500}},
+	    rm_dup_test5 = {.count = 9, .data = {5, 5, 5, 4, 4, 3, 2, 1, 1}},
+	    rm_dup_test6 = {.count = 8, .data = {1, 1, 1, 1, 2, 2, 2, 2}};
+    
+    Int_Arr rm_dup_tests[6] = {
+	rm_dup_test1,
+	rm_dup_test2,
+	rm_dup_test3,
+	rm_dup_test4,
+	rm_dup_test5,
+	rm_dup_test6,
+    };
+
+    for (int i = 0; i < 6; i++) {
+	int* new_arr = remove_duplicates(rm_dup_tests[i].data, rm_dup_tests[i].count);
+	print_int_array(new_arr, rm_dup_tests[i].count);
+    }
+    printf("\n");
+    
+    // -----------------------------------------------------------------------
+    // count_sort
+    printf("Time for the big ones! COUNT SORT:\n\n");
+
+    
+    
+    // -----------------------------------------------------------------------
+    // sorted_squares
+    printf("SORTED_SQUARES:\n\n");
+
+    
+    // -----------------------------------------------------------------------
     
     
     
@@ -292,9 +369,11 @@ int is_int_sorted(int *arr, int len)
     // One element considered strictly ascending
     if (len == 1)
         return 1;
+    
     // If start and end equal, must be neither
     if (arr[0] == arr[len - 1])
         return 0;
+    
     // Array order indicators. 1 for ascending, -1 for descending
     int arr_order = (arr[0] < arr[len - 1]) ? 1 : -1;
 
@@ -304,10 +383,89 @@ int is_int_sorted(int *arr, int len)
         if (arr[i - 1] == arr[i] || arr[len - i] == arr[len - 1 - i])
             return 0;
 
-        // Breaks loop if expected order incorrent
+        // Breaks loop if expected order incorrect
         if ((arr_order == 1 && (arr[i - 1] >= arr[i])) ||
             (arr_order == -1 && (arr[i - 1] <= arr[i])))
 	    return 0;
     }
     return arr_order;
 }
+
+/**
+ * Finds the mode of an integer array. Returns the mode and its frequency in a
+ * struct.
+ */
+Int_Mode int_find_mode(int *arr, int len)
+{
+    // Initialize to match first value in array
+    int high_val = arr[0];
+    int curr = 1;
+    int high_count = 1;
+
+    // Iterate through the rest, updating variables as it goes
+    for (int i = 1; i < len; i++) {
+	if (arr[i] != arr[i-1])
+	    curr = 1;
+	else
+	    curr++;
+
+	if (curr > high_count) {
+	    high_val = arr[i];
+	    high_count = curr;
+	}
+    }
+
+    return (Int_Mode) {.count = high_count, .mode = high_val};
+}
+
+/**
+ * Finds the mode of an array of strings. Returns the mode and its frequency in
+ * a struct.
+ */
+Str_Mode str_find_mode(char** arr, int len)
+{
+    // Initialize to match first value in array
+    char* high_val = arr[0];
+    int curr = 1;
+    int high_count = 1;
+
+    // Iterate through the rest, updating variables as it goes
+    for (int i = 1; i < len; i++) {
+	if (strcmp(arr[i], arr[i-1]))
+	    curr = 1;
+	else
+	    curr++;
+
+	if (curr > high_count) {
+	    high_val = arr[i];
+	    high_count = curr;
+	}
+    }
+
+    return (Str_Mode) {.count = high_count, .mode = high_val};
+}
+
+/**
+ * Creates a new array from the input with duplicates removed. The inputed
+ * array must already be in sorted order.
+ */
+int* remove_duplicates(int* arr, int len)
+{
+    // Initialize new array with first values
+    int* new_arr = calloc(len, sizeof(int));
+    new_arr[0] = arr[0];
+    int new_arr_count = 1;
+
+    for (int i = 1; i < len; i++) {
+	if (arr[i] != arr[i-1]) {
+	    new_arr[new_arr_count] = arr[i];
+	    new_arr_count++;
+	}
+    }
+    return new_arr;
+}
+
+//int* count_sort(int* arr, int len);
+
+// int* sorted_squares
+
