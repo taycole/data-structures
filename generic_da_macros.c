@@ -1,3 +1,10 @@
+// Name: generic_da_macros.c
+// Purpose: Implements a dynamic array using macros, allowing it to be generic.
+//          May have unforseen consequences.
+//
+// Author: Taylor Cole
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>

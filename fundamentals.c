@@ -1,6 +1,7 @@
-/* Static array fundamentals.
- * Implements 10 functions that manipulate an array.
- */
+// Name: fundamentals.c
+// Purpose: Implements 10 functions that manipulate a static array.
+// Author: Taylor Cole
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

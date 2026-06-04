@@ -1,3 +1,7 @@
+// Name: int_da.c
+// Purpose: Implements dynamic arrays for integers
+// Author: Taylor Cole
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
