@@ -50,7 +50,7 @@ Str_Mode str_find_mode(char** arr, int len);
 
 int* remove_duplicates(int* arr, int len);
 
-int* count_sort(int* arr, int len);
+Int_Arr* count_sort(int* arr, int len);
 
 // Used to test out the functions
 int main()
@@ -190,9 +190,31 @@ int main()
     // -----------------------------------------------------------------------
     // count_sort
     printf("Time for the big ones! COUNT SORT:\n\n");
+    Int_Arr count_sort_test1 = {.count = 5, .data = {1, 2, 4, 3, 5}},
+	count_sort_test2 = {.count = 5, .data = {5, 4, 3, 2, 1}},
+	count_sort_test3 = {.count = 7, .data = {0, -5, -3, -4, -2, -1, 0}},
+	count_sort_test4 = {.count = 7, .data = {-3, -2, -1, 0, 1, 2, 3}},
+	count_sort_test5 = {.count = 12, .data = {1, 2, 3, 4, 3, 2, 1, 5, 5, 2, 3, 1}},
+	count_sort_test6 = {.count = 4, .data = {10100, 10721, 10320, 10998}},
+	count_sort_test7 = {.count = 4, .data = {-100320, -100450, -100999, -100001}};
 
-    
-    
+    Int_Arr count_sort_tests[7] = {
+	count_sort_test1,
+	count_sort_test2,
+	count_sort_test3,
+	count_sort_test4,
+	count_sort_test5,
+	count_sort_test6,
+	count_sort_test7,
+    };
+
+    for (int i = 0; i < 7; i++) {
+	Int_Arr* result = count_sort(count_sort_tests[i].data, count_sort_tests[i].count);
+	print_int_array(count_sort_tests[i].data, count_sort_tests[i].count);
+	print_int_array(result->data, result->count);
+    }
+    printf("\n");
+        
     // -----------------------------------------------------------------------
     // sorted_squares
     printf("SORTED_SQUARES:\n\n");
@@ -466,7 +488,45 @@ int* remove_duplicates(int* arr, int len)
     return new_arr;
 }
 
-//int* count_sort(int* arr, int len);
+/**
+ * Count sorts the given array. Returns a new static array of sorted values.
+ */
+Int_Arr* count_sort(int* arr, int len)
+{
+    struct min_max mm = get_min_max(arr, len);
+    int min_val = mm.min, max_val = mm.max;
+    int count_arr[max_val - min_val + 1] = {};
+
+    // Build the count array
+    for (int i = 0; i < len; i++) {
+	if (count_arr[arr[i] - min_val] == 0)
+	    count_arr[arr[i] - min_val] = 1;
+	else
+	    count_arr[arr[i] - min_val]++;
+    }
+
+    // Create the complimentary array for building a new list
+    int comp_count[NELEMS(count_arr)];
+    int temp_sum = count_arr[0];
+    comp_count[0] = count_arr[0];
+
+    // Each new index value is a sum of the previous index values
+    for (int i = 1; i < NELEMS(count_arr); i++) {
+	temp_sum += count_arr[i];
+	comp_count[i] = temp_sum;
+    }
+
+    // Build sorted list using complimentary array count
+    Int_Arr* new_array = malloc(sizeof(Int_Arr));
+    new_array->count = len;
+    for (int i = 0; i < comp_count[0]; i++)
+	new_array->data[len-1-i] = min_val;
+    for (int i = 1; i < NELEMS(comp_count); i++) {
+	for (int n = comp_count[i-1]; n < comp_count[i]; n++)
+	    new_array->data[len-1-n] = i + min_val;
+    }
+    return new_array;
+}
 
 // int* sorted_squares
 
