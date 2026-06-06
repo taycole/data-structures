@@ -1,5 +1,7 @@
 // Name: int_sll.c
-// Purpose: Implements a singly linked list data structure for integers
+// Purpose: Implements a singly linked list data structure for integers. Head
+//          is empty.
+//
 // Author: Taylor Cole
 
 #include <stdio.h>
