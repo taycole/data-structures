@@ -27,6 +27,17 @@ Int_Queue* queue_init()
     return q;
 }
 
+void queue_free(Int_Queue* q)
+{
+    Int_Node* curr = q->head, next_node;
+    while (curr) {
+	next_node = curr->next;
+	free(curr);
+	curr = next_node;
+    }
+    free(q);
+}
+
 /**
  * Creates a node on the heap with the given value
  */
