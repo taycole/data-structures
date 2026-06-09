@@ -7,6 +7,7 @@
 #include <stdbool.h>
 #include <errno.h>
 #include <math.h>
+#include "generic_da_macros.c"
 
 #define NLR   0
 #define LNR   1
@@ -123,55 +124,53 @@ bool bt_remove(BT* bt, int val);
 //}
 
 
+void bt_print_children(BT_Node* node)
+{
+    if (node->left)
+	printf("(%d) ", node->left->value);
+    else
+	printf("(empty) ");
+
+    if (node->right)
+	printf(" (%d)", node->right->value);
+    else
+	printf(" (empty)\n");
+}
+
+typedef struct BT_Queue {
+    size_t size;
+    size_t capacity;
+    BT_Node** data;
+} BT_Queue;
+
+
 
 
 /**
  * Converts a binary tree to a queue linked list via a BFS / level order traversal.
  */
-BT_Queue* bt_convert_queue(BT* bt)
+void bt_print_queue(BT* bt)
 {
-    BT_Queue* node_store = queue_init();
-    BT_Queue* traverse = queue_init();
-    Q_Node* curr;
-    enqueue(traverse, bt-root);
+    //BT_Queue* node_store = da_init();
+    BT_Queue* traverse = da_init(BT_Queue);
+    BT_Node* curr;
+    printf("(%d)\n", bt->root->value);
+    da_enqueue(traverse, bt->root);
 
-    while (queue_size(traverse) != 0) {
-	curr = dequeue(traverse);
+    while (traverse->size != 0) {
+	curr = da_dequeue(BT_Node*, traverse);
 	if (curr != NULL) {
-	    enqueue(node_store, curr);
-	    enqueue(traverse, curr->left);
-	    enqueue(traverse, curr->right);
+	    bt_print_children(curr);
+	    
+	    da_enqueue(traverse, curr->left);
+	    da_enqueue(traverse, curr->right);
 	}
     }
-       
-    return q;
 }
 
 // ----------------------------------------------------------------------------
 
-/**
- * Recursive helper function to print out a binary tree.
- */
-void bt_rec_print_subtree(BT* bt, BT_Node* node)
-{
-    if (!node) {
-	printf("Bottom-------------------");
-	return;
-    }
 
-    
-}
-
-/**
- * prints out the binary tree. Uses a recursive helper function.
- */
-void bt_print_tree(BT* bt)
-{
-    if (bt->root != NULL)
-	bt_rec_print_subtree(bt, bt->root);
-    else
-	printf("(tree is empty)");
-}
 
 void print_indent_spaces(int num_spaces, char* str)
 {
@@ -198,9 +197,7 @@ int main()
 
     for (int i = 0; i < 10; i++) bt_add(test, bt_vals[i]);
 
-    Int_Queue* bt_q = bt_convert_queue(test);
-
-    queue_print(bt_q);
+    bt_print_queue(test);
 
     return 0;
 }

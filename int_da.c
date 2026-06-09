@@ -225,5 +225,41 @@ int da_top(Int_DA* arr)
 	perror("da_top: no elements to look at");
 	exit(-1);
     }
-    return arr->data[arr->size-1];;    
+    return arr->data[arr->size-1];
+}
+
+// ------------------- Queue --------------------------------------------------
+
+/**
+ * Alias for appending
+ */
+void da_enqueue(Int_DA* arr, int val)
+{
+    da_append(arr, val);
+}
+
+/**
+ * Dequeues value from front of array (index 0)
+ */
+int da_dequeue(Int_DA* arr)
+{
+    if (arr->size == 0) {
+	perror("da_dequeue: no elements to dequeue");
+	exit(-1);
+    }
+    int val = arr->data[0];
+    da_remove_at_index(arr, 0);
+    return val;
+}
+
+/**
+ * Return value at the front of queue without dequeuing
+ */
+int da_peek(Int_DA* arr)
+{
+    if (arr->size == 0) {
+	perror("da_peek: no elements to peek at");
+	exit(-1);
+    }
+    return arr->data[0];
 }
