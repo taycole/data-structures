@@ -77,12 +77,122 @@ void bt_add(BT* bt, int val)
 }
 
 /**
+ * Removes a node that has no children
+ */
+void bt_remove_no_subtrees(BT* bt, BT_Node* r_parent, BT_Node* r_node)
+{
+    // Is the root with no children
+    if (r_parent == NULL)
+	bt->root = NULL;
+    // Remove node is to the left
+    else if (r_node->value < r_parent->value) 
+	r_parent->left = NULL;
+    // Remove node is to the right
+    else
+	r_parent->right = NULL;
+
+    free(r_node);
+}
+
+/**
+ * Removes a node from the tree that has one child
+ */
+void bt_remove_one_subtree(BT* bt, BT_Node* r_parent, BT_Node* r_node)
+{
+    // Determine which child
+    BT_Node* child;
+    if (r_node->left == NULL)
+        child = r_node->right;
+    else
+	child = r_node->left;
+
+    // Replace node to be removed with its child
+    if (r_parent == NULL)
+	bt->root = child;
+    else if (r_node->value < r_parent->value)
+	r_parent->left = child;
+    else
+	r_parent->right = child;
+    
+    free(r_node);
+}
+
+typedef struct Inorder_S {
+    BT_Node* parent;
+    BT_Node* successor;
+} Inorder_S;
+
+/**
+ * Finds the inorder successor and its parent. Returns them together in a struct
+ */
+Inorder_S bt_find_inorder_successor(BT_Node* node)
+{
+    BT_Node* successor_parent = node;
+    BT_Node* successor = node->right;
+
+    // Iterate until the leftmost node
+    while (successor->left != NULL) {
+	successor_parent = successor;
+	successor = successor->left;
+    }
+    return (Inorder_S){.parent = successor_parent, .successor = successor};
+}
+
+/**
+ * Removes a node with two children by replacing it with its inorder successor
+ */
+void bt_remove_two_subtrees(BT* bt, BT_Node* r_parent, BT_Node* r_node)
+{
+    // Gets inorder successor and its parent from helper function
+    Inorder_S s = bt_find_inorder_successor(r_node);
+
+    s.successor->left = r_node->left;
+    if (s.successor != r_node->right) {
+	s.parent->left = s.successor->right;
+	s.successor->right = r_node->right;
+    }
+
+    // Update removed node's parent to point to new node. If root, set as root.
+    if (r_parent == NULL)
+	bt->root = s.successor;
+    else if (r_node->value < r_parent->value)
+	r_parent->left = s.successor;
+    else
+	r_parent->right = s.successor;
+
+    free(r_node);
+}
+
+/**
  * Removes a value from the tree. Returns true if successful, false otherwise
  */
-bool bt_remove(BT* bt, int val);
+bool bt_remove(BT* bt, int val)
+{
+    BT_Node *parent = NULL, *curr_node = bt->root;
+    while (curr_node && curr_node->value != val) {
+	parent = curr_node;
+	if (val < curr_node->value)
+	    curr_node = curr_node->left;
+	else
+	    curr_node = curr_node->right;
+    }
 
+    // Search failed
+    if (curr_node == NULL)
+	return false;
 
+    // Node has both children, calls helper function to remove two subtrees
+    else if (curr_node->left != NULL && curr_node->right != NULL)
+	bt_remove_two_subtrees(bt, parent, curr_node);
+    // Node has one child, call helper to remove one subtree
+    else if (curr_node->left != NULL || curr_node->right != NULL)
+	bt_remove_one_subtree(bt, parent, curr_node);
+    // Node is a leaf, call helper to remove with no subtrees
+    else
+	bt_remove_no_subtrees(bt, parent, curr_node);
 
+    return true;
+}
 
 
 
@@ -190,9 +300,15 @@ int main()
 
     for (int i = 0; i < LEN(bt_vals); i++) bt_add(test, bt_vals[i]);
 
-    //int height = bt_get_height(test);
-    //int width = pow(2, height) - 1;
-    //printf("Height: %d, Width: %d\n", height, width);
+    bt_print_queue(test);
+    printf("\nafter removal-------\n\n");
+    //leaf
+    //bt_remove(test, 16);
+
+    // one child
+    //bt_remove(test, 48);
+    // two children
+    bt_remove(test, 80);
 
     bt_print_queue(test);
 
