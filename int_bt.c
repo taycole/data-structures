@@ -7,7 +7,10 @@
 #include <stdbool.h>
 #include <errno.h>
 #include <math.h>
-#include "generic_da_macros.c"
+#include <string.h>
+#include "da_macros.c"
+
+#define LEN(arr) (sizeof(arr) / sizeof(*arr))
 
 #define NLR   0
 #define LNR   1
@@ -56,7 +59,7 @@ void bt_add(BT* bt, int val)
     }
 
     BT_Node *curr = bt->root, *parent;
-    
+
     while (curr) {
 	parent = curr;
 	if (val < curr->value)
@@ -66,7 +69,7 @@ void bt_add(BT* bt, int val)
     }
 
     BT_Node* new_node = bt_node_init(val);
-    
+
     if (val < parent->value)
 	parent->left = new_node;
     else
@@ -79,6 +82,127 @@ void bt_add(BT* bt, int val)
 bool bt_remove(BT* bt, int val);
 
 
+
+
+
+
+// ----------- Functions to find height/width, print tree ---------------------
+
+/**
+ * Recursive helper function to get the max height of the tree.
+ */
+void rec_get_height(BT_Node* node, int curr_h, int* h)
+{
+    if (node != NULL) {
+	rec_get_height(node->left, curr_h+1, h);
+	rec_get_height(node->right, curr_h+1, h);
+        *h = (curr_h > *h)? curr_h : *h;
+    }
+}
+
+/**
+ * Finds the max height of the tree using a recursive DFS traversal
+ */
+int bt_get_height(BT* bt)
+{
+    int h = 0;
+    rec_get_height(bt->root, 0, &h);
+    return h;
+}
+
+typedef struct Queue_DA {
+    size_t size;
+    size_t capacity;
+    BT_Node** data;
+} Queue_DA;
+
+/**
+ * Finds the max width of the tree using a BFS traversal with a queue
+ */
+int bt_get_width(BT* bt)
+{
+    int max_w = 1;
+    Queue_DA* q = da_init(Queue_DA);
+    da_enqueue(q, bt->root);
+
+    while (q->size != 0) {
+	max_w = (q->size > max_w)? q->size : max_w;
+	BT_Node* node = da_dequeue(q);
+	
+	if (node->left) da_enqueue(q, node->left);
+	if (node->right) da_enqueue(q, node->right);
+    }
+    return max_w;
+}
+
+typedef struct Arr_2D {
+    int data[512][512];
+} Arr_2D;
+
+/**
+ * Puts values of tree into a matrix in order to print. Uses a DFS search.
+ */
+void rec_fill_matrix(BT_Node* node, Arr_2D* matrix, int row, int l_col, int r_col)
+{
+    if (node) {
+	int mid_col = (l_col + r_col) / 2;
+	matrix->data[row][mid_col] = node->value;
+	rec_fill_matrix(node->left, matrix, row+1, l_col, mid_col-1);
+	rec_fill_matrix(node->right, matrix, row+1, mid_col+1, r_col);
+    }
+}
+
+/**
+ * Prints binary tree by recording it in a matrix. Only looks right if the
+ * tree is somewhat balanced due to symmetric spacing.
+ */
+void bt_print_queue(BT* bt)
+{
+    // Padding added to keep the symmetry right
+    int h = bt_get_height(bt) + 1;
+    int w = bt_get_width(bt);
+    w = (w % 2 == 0)? (w+1)*3 : w*3;
+
+    Arr_2D* matrix = malloc(sizeof(Arr_2D));
+    memset(matrix->data, 0, sizeof(matrix->data));
+
+    rec_fill_matrix(bt->root, matrix, 0, 0, w-1);
+
+    for(int i = 0; i < h; i++) {
+	for (int j = 0; j < w; j++) {
+	    if (matrix->data[i][j])
+		printf("%d ", matrix->data[i][j]);
+	    else
+		printf("-- ");
+	}
+	printf("\n");
+    }
+    free(matrix);
+}
+
+
+
+int main()
+{
+    BT* test = bt_init();
+    int bt_vals[] = {64, 32, 16, 48, 56, 80, 72, 88, 84, 96};
+    //int bt_vals[] = {11, 22, 33, 44, 55, 66, 77, 88, 99, 5};
+
+    for (int i = 0; i < LEN(bt_vals); i++) bt_add(test, bt_vals[i]);
+
+    //int height = bt_get_height(test);
+    //int width = pow(2, height) - 1;
+    //printf("Height: %d, Width: %d\n", height, width);
+
+    bt_print_queue(test);
+
+    return 0;
+}
+
+
+
+
+
 ///**
 // * Recursive helper to push binary tree values onto linked-list stack in
 // * order (LNR)
@@ -87,10 +211,10 @@ bool bt_remove(BT* bt, int val);
 //{
 //    if (order == NLR) {
 //        if (node) {
-//            sll_push(stack, node->value);	    
+//            sll_push(stack, node->value);
 //	    rec_convert_stack(node->left, stack, order);
 //	    rec_convert_stack(node->right, stack, order);
-//        }	
+//        }
 //    }
 //    else if (order == LNR) {
 //        if (node) {
@@ -104,12 +228,12 @@ bool bt_remove(BT* bt, int val);
 //	    rec_convert_stack(node->left, stack, order);
 //	    rec_convert_stack(node->right, stack, order);
 //            sll_push(stack, node->value);
-//        }	
+//        }
 //    }
 //    else
 //	return;
 //}
-//    
+//
 ///**
 // * Converts a binary tree to a stack as a linked list in the given order:
 // *    NLR: Preorder traversal
@@ -122,82 +246,3 @@ bool bt_remove(BT* bt, int val);
 //    rec_convert_stack(bt->root, stack, order);
 //    return stack;
 //}
-
-
-void bt_print_children(BT_Node* node)
-{
-    if (node->left)
-	printf("(%d) ", node->left->value);
-    else
-	printf("(empty) ");
-
-    if (node->right)
-	printf(" (%d)", node->right->value);
-    else
-	printf(" (empty)\n");
-}
-
-typedef struct BT_Queue {
-    size_t size;
-    size_t capacity;
-    BT_Node** data;
-} BT_Queue;
-
-
-
-
-/**
- * Converts a binary tree to a queue linked list via a BFS / level order traversal.
- */
-void bt_print_queue(BT* bt)
-{
-    //BT_Queue* node_store = da_init();
-    BT_Queue* traverse = da_init(BT_Queue);
-    BT_Node* curr;
-    printf("(%d)\n", bt->root->value);
-    da_enqueue(traverse, bt->root);
-
-    while (traverse->size != 0) {
-	curr = da_dequeue(BT_Node*, traverse);
-	if (curr != NULL) {
-	    bt_print_children(curr);
-	    
-	    da_enqueue(traverse, curr->left);
-	    da_enqueue(traverse, curr->right);
-	}
-    }
-}
-
-// ----------------------------------------------------------------------------
-
-
-
-void print_indent_spaces(int num_spaces, char* str)
-{
-    printf("%*s%s", num_spaces, "", str);
-}
-
-/**
- * prints out the binary tree stack. Preorder (NLR) gives the correct values.
- */
-//void bt_print(BT* bt)
-//{
-//    int num_nodes = sll_length(stack);
-//    int height = (int)log2(num_nodes);
-//    
-//    for(int i = 0; i < len; i++) {
-//	
-//    }
-//}
-
-int main()
-{
-    BT* test = bt_init();
-    int bt_vals[] = {64, 32, 16, 48, 56, 80, 72, 88, 84, 96};
-
-    for (int i = 0; i < 10; i++) bt_add(test, bt_vals[i]);
-
-    bt_print_queue(test);
-
-    return 0;
-}

@@ -1,6 +1,6 @@
-// Name: int_sll_sq.c
-// Purpose: Implements Linked list with head and tail pointers for stacks and
-//          queues.
+// int_sll_sq.c
+//
+// Implements a linked list with head and tail pointers for stacks and queues.
 //
 // Author: Taylor Cole
 
