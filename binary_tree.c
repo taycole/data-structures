@@ -1,5 +1,7 @@
-// Name: binary_tree.c
-// Purpose: Implements a binary tree data type for integers
+// binary_tree.c
+//
+// Implements a binary tree data structure.
+//
 // Author: Taylor Cole
 
 #include <stdio.h>
