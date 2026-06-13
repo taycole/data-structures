@@ -204,8 +204,23 @@ bool bt_remove(BT* bt, int val)
     return true;
 }
 
-bool bt_contains(BT* bt);
-
+/**
+ * Searches for a node in the tree with the given key. Returns true if found,
+ * false otherwise.
+ */
+bool bt_contains(BT* bt, int key)
+{
+    BT_Node* curr = bt->root;
+    while (curr) {
+	if (key == curr->key)
+	    return true;
+	else if (key < curr->key)
+	    curr = curr->left;
+	else
+	    curr = curr->right;
+    }
+    return false;
+}
 
 /**
  * Recursive helper function to traverse a tree and store keys in a queue.
@@ -219,17 +234,17 @@ void bt_rec_traverse(BT_Node* node, int mode, Int_Queue_DA* q)
 	    bt_rec_traverse(node->right, mode, q);
 	}
     }
-    else if (order == LNR) {
+    else if (mode == LNR) {
 	if (node) {
 	    bt_rec_traverse(node->left, mode, q);
 	    da_enqueue(q, node->key);
 	    bt_rec_traverse(node->right, mode, q);
 	}
     }
-    else if (order == LRN) {
+    else if (mode == LRN) {
 	if (node) {
 	    bt_rec_traverse(node->left, mode, q);
-	    bt_rec_traverse(node->right, mode, q);	    
+	    bt_rec_traverse(node->right, mode, q);
             da_enqueue(q, node->key);
 	}
     }
@@ -252,6 +267,89 @@ Int_Queue_DA* bt_recursive_traversal(BT* bt, int mode)
     return q;
 }
 
+/**
+ * Performs an iterative traversal of the tree, storing the keys in a queue.
+ *
+ */
+Int_Queue_DA* bt_iterative_traversal(BT* bt, int mode)
+{
+    Int_Queue_DA* arr = da_init(Int_Queue_DA);
+    BT_Queue_DA* stack = da_init(BT_Queue_DA);
+    BT_Node *curr, *prev;
+
+    // Preorder
+    if (mode == NLR) {
+	if (bt->root) da_push(stack, bt->root);
+	while (stack->size != 0) {
+	    curr = da_pop(stack);
+	    da_enqueue(arr, curr->key);  // record node - inorder
+    	    if (curr->right) da_push(stack, curr->right);
+	    if (curr->left) da_push(stack, curr->left);
+	}
+    }
+    // Inorder
+    else if (mode == LNR) {
+        curr = bt->root;
+	while (stack->size != 0 || curr != NULL) {
+	    if (curr) {
+		da_push(stack, curr);
+		curr = curr->left;
+	    }
+	    // Enqueue on backtrack
+	    else {
+	        curr = da_pop(stack);
+		da_enqueue(arr, curr->key);
+		curr = curr->right;
+	    }
+	}
+    }
+    // Post Order
+    else if (mode == LRN) {
+        curr = bt->root;
+	prev = NULL;
+	while (stack->size != 0 || curr != NULL) {
+	    if (curr) {
+		da_push(stack, curr);
+		curr = curr->left;
+	    }
+	    // Hit the end of left, try to go right
+	    else {
+		BT_Node* top = da_top(stack);
+		if (top->right != NULL && top->right != prev) {
+		    curr = top->right;
+		}
+		// Nothing to the right, visit then continue trying right from last
+		else {
+		    da_enqueue(arr, top->key);
+		    prev = top;
+		    da_pop(stack);
+		}
+	    }
+	}
+    }
+    da_free(stack);
+    return arr;
+}
+
+/**
+ * Frees memory for all the nodes then the tree struct itself.
+ */
+void bt_free(BT* bt)
+{
+    BT_Node* curr;
+    BT_Queue_DA* stack = da_init(BT_Queue_DA);
+
+    if (bt->root) da_push(stack, bt->root);
+
+    while (stack->size != 0) {
+	curr = da_pop(stack);
+	if (curr->right) da_push(stack, curr->right);
+	if (curr->left) da_push(stack, curr->left);
+	free(curr);
+    }
+    da_free(stack);
+    free(bt);
+}
 
 
 // ----------- Functions to find height/width, print tree ---------------------
@@ -316,14 +414,15 @@ void rec_fill_matrix(BT_Node* node, Arr_2D* matrix, int row, int l_col, int r_co
 }
 
 /**
- * Prints binary tree by recording it in a matrix. Only looks right if the
- * tree is somewhat balanced due to symmetric spacing.
+ * Prints binary tree by recording it in a matrix then printing the matrix in
+ * a way that looks symmetrical. Can get weird with unbalanced trees.
+ *
  */
 void bt_print_queue(BT* bt)
 {
     // Padding added to keep the symmetry right
     int h = bt_get_height(bt) + 1;
-    int w = bt_get_width(bt);
+    int w = bt_get_width(bt) + 2;
     w = (w % 2 == 0)? (w+1)*3 : w*3;
 
     Arr_2D* matrix = malloc(sizeof(Arr_2D));
@@ -334,7 +433,7 @@ void bt_print_queue(BT* bt)
     for(int i = 0; i < h; i++) {
 	for (int j = 0; j < w; j++) {
 	    if (matrix->data[i][j])
-		printf("%d ", matrix->data[i][j]);
+		printf("%02d ", matrix->data[i][j]);
 	    else
 		printf("-- ");
 	}
@@ -348,70 +447,15 @@ void bt_print_queue(BT* bt)
 int main()
 {
     BT* test = bt_init();
-    int bt_vals[] = {64, 32, 16, 48, 56, 80, 72, 88, 84, 96};
+    //int bt_vals[] = {64, 32, 16, 48, 56, 80, 72, 88, 84, 96};
     //int bt_vals[] = {11, 22, 33, 44, 55, 66, 77, 88, 99, 5};
+    int bt_vals[] = {5, 4, 6, 3, 7, 2, 8};
 
     for (int i = 0; i < LEN(bt_vals); i++) bt_add(test, bt_vals[i]);
 
     bt_print_queue(test);
-    printf("\nafter removal-------\n\n");
-    //leaf
-    //bt_remove(test, 16);
+    printf("\n-------\n\n");
 
-    // one child
-    //bt_remove(test, 48);
-    // two children
-    bt_remove(test, 80);
-
-    bt_print_queue(test);
-
+    bt_free(test);
     return 0;
 }
-
-
-
-
-
-///**
-// * Recursive helper to push binary tree keys onto linked-list stack in
-// * order (LNR)
-// */
-//void rec_convert_stack(BT_Node* node, Int_Node* stack, int order)
-//{
-//    if (order == NLR) {
-//        if (node) {
-//            sll_push(stack, node->key);
-//	    rec_convert_stack(node->left, stack, order);
-//	    rec_convert_stack(node->right, stack, order);
-//        }
-//    }
-//    else if (order == LNR) {
-//        if (node) {
-//	    rec_convert_stack(node->left, stack, order);
-//            sll_push(stack, node->key);
-//	    rec_convert_stack(node->right, stack, order);
-//        }
-//    }
-//    else if (order == LRN) {
-//        if (node) {
-//	    rec_convert_stack(node->left, stack, order);
-//	    rec_convert_stack(node->right, stack, order);
-//            sll_push(stack, node->key);
-//        }
-//    }
-//    else
-//	return;
-//}
-//
-///**
-// * Converts a binary tree to a stack as a linked list in the given order:
-// *    NLR: Preorder traversal
-// *    LNR: Inorder traversal
-// *    LRN: Postorder traversal
-// */
-//Int_Node* bt_convert_stack(BT* bt, int order)
-//{
-//    Int_Node* stack = sll_init();
-//    rec_convert_stack(bt->root, stack, order);
-//    return stack;
-//}

@@ -220,3 +220,16 @@ do {\
     }\
     arr->data[0];\
 })
+
+// ------------------------- Print the DA -------------------------------------
+
+/**
+ * Can print DA values. Must pass the format specifier for printf.
+ */
+#define da_print(arr, format_str)\
+({\
+    printf("( ");\
+    for (int i = 0; i < arr->size; i++)\
+	printf(format_str, arr->data[i]);\
+    printf(")\n");\
+})
