@@ -13,10 +13,10 @@
 //
 // Author: Taylor Cole
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <errno.h>
+#include <stdio.h> // printf
+#include <stdlib.h> // malloc, realloc, free, etc.
+#include <stdbool.h> // true and false
+#include <errno.h> // perror
 
 /**
  * Creates an empty dynamic array on the heap with default capacity 4

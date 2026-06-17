@@ -420,7 +420,7 @@ void rec_fill_matrix(BT_Node* node, Arr_2D* matrix, int row, int l_col, int r_co
  * a way that looks symmetrical. Can get weird with unbalanced trees.
  *
  */
-void bt_print_queue(BT* bt)
+void bt_print(BT* bt)
 {
     // Padding added to keep the symmetry right
     int h = bt_get_height(bt) + 1;
@@ -455,7 +455,7 @@ int main()
 
     for (int i = 0; i < LEN(bt_vals); i++) bt_add(test, bt_vals[i]);
 
-    bt_print_queue(test);
+    bt_print(test);
     printf("\n-------\n\n");
 
     bt_free(test);
