@@ -43,6 +43,10 @@ typedef struct Int_Queue_DA {
     int* data;
 } Int_Queue_DA;
 
+typedef struct Arr_2D {
+    int data[512][512];
+} Arr_2D;
+
 /**
  * Initialize an empty tree
  */
@@ -173,7 +177,7 @@ void avl_rebalance(AVL* avl, AVL_Node* node)
 	AVL_Node* new_subtree_root = avl_rotate_left(node);
 	new_subtree_root->parent = old_parent;
 
-	// Updates the original parent ot point to the new subtree node
+	// Updates the original parent to point to the new subtree node
 	if (old_parent == NULL)
 	    avl->root = new_subtree_root;
 	else if (node->key > old_parent->key)
@@ -185,7 +189,6 @@ void avl_rebalance(AVL* avl, AVL_Node* node)
     else
 	avl_update_height(node);
 }
-
 
 /**
  * Add a node with a key to the avl tree. Balances the tree afterwards.
@@ -521,55 +524,6 @@ void avl_free(AVL* avl)
     free(avl);
 }
 
-
-// ----------- Functions to find height/width, print tree ---------------------
-
-/**
- * Recursive helper function to get the max height of the tree.
- */
-void rec_get_height(AVL_Node* node, int curr_h, int* h)
-{
-    if (node != NULL) {
-	rec_get_height(node->left, curr_h+1, h);
-	rec_get_height(node->right, curr_h+1, h);
-	*h = (curr_h > *h)? curr_h : *h;
-    }
-}
-
-/**
- * Finds the max height of the tree using a recursive DFS traversal
- */
-int bt_get_height(AVL* bt)
-{
-    int h = 0;
-    rec_get_height(bt->root, 0, &h);
-    return h;
-}
-
-/**
- * Finds the max width of the tree using a BFS traversal with a queue
- */
-int bt_get_width(AVL* bt)
-{
-    int max_w = 1;
-    AVL_Queue_DA* q = da_init(AVL_Queue_DA);
-    da_enqueue(q, bt->root);
-
-    while (q->size != 0) {
-	max_w = (q->size > max_w)? q->size : max_w;
-	AVL_Node* node = da_dequeue(q);
-
-	if (node->left) da_enqueue(q, node->left);
-	if (node->right) da_enqueue(q, node->right);
-    }
-    da_free(q);
-    return max_w;
-}
-
-typedef struct Arr_2D {
-    int data[512][512];
-} Arr_2D;
-
 /**
  * Puts keys of tree into a matrix in order to print. Uses a DFS search.
  */
@@ -584,32 +538,29 @@ void rec_fill_matrix(AVL_Node* node, Arr_2D* matrix, int row, int l_col, int r_c
 }
 
 /**
- * Prints binary tree by recording it in a matrix then printing the matrix in
- * a way that looks symmetrical. Can get weird with unbalanced trees.
+ * Prints avl tree by recording it in a matrix then printing the matrix in
+ * a way that looks symmetrical. Can get weird with deep trees
  *
  */
-void avl_print_queue(AVL* avl)
+void avl_print(AVL* avl)
 {
-    // Padding added to keep the symmetry right
     int h = avl->root->height;
+
+    // Padding added to keep the symmetry somewhat right
     int w = (pow(2, h-1) + 2) * 3;
-    //w = (w % 2 == 0)? (w+1)*3 : w*3;
 
-    Arr_2D* matrix = malloc(sizeof(Arr_2D));
-    memset(matrix->data, 0, sizeof(matrix->data));
-
-    rec_fill_matrix(avl->root, matrix, 0, 0, w-1);
+    Arr_2D matrix = {0};
+    rec_fill_matrix(avl->root, &matrix, 0, 0, w-1);
 
     for(int i = 0; i < h + 1; i++) {
 	for (int j = 0; j < w; j++) {
-	    if (matrix->data[i][j])
-		printf("%02d ", matrix->data[i][j]);
+	    if (matrix.data[i][j])
+		printf("%02d ", matrix.data[i][j]);
 	    else
 		printf("-- ");
 	}
 	printf("\n");
     }
-    free(matrix);
 }
 
 // ----------------------------------------------------------------------------
@@ -621,10 +572,18 @@ int main()
     //int avl_vals[] = {11, 22, 33, 44, 55, 66, 77, 88, 99, 5};
     //int avl_vals[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
     //for (int i = 0; i < LEN(avl_vals); i++) avl_add(test, avl_vals[i]);
-    for (int i = 1; i < 7; i++) avl_add(test, i);
 
-    avl_print_queue(test);
-    printf("\n-------\n\n");
+    for (int i = 1; i < 30; i++) {
+	printf("adding %d-----\n", i);
+	avl_add(test, i);
+        avl_print(test);
+        printf("\n-------\n\n");
+    }
+    //for (int i = 1; i < 12; i++) avl_add(test, i);
+    //avl_print_queue(test);
+    //printf("\n-------\n\n");
+
+
 
     avl_free(test);
     return 0;
