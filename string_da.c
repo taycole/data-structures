@@ -1,6 +1,6 @@
 // Name: string_da.c
 // Purpose: Implements dynamic arrays for a string datatype.
-// Author: Taylor Cole 
+// Author: Taylor Cole
 
 #include <stdio.h>
 #include <stdlib.h>
