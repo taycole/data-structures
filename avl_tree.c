@@ -47,6 +47,11 @@ typedef struct Arr_2D {
     int data[512][512];
 } Arr_2D;
 
+typedef struct Inorder_S {
+    AVL_Node* parent;
+    AVL_Node* successor;
+} Inorder_S;
+
 /**
  * Initialize an empty tree
  */
@@ -116,7 +121,6 @@ AVL_Node* avl_rotate_left(AVL_Node* node)
     return child;
 }
 
-
 /**
  * Rotates a node to the right and returns the promoted child
  */
@@ -138,7 +142,6 @@ AVL_Node* avl_rotate_right(AVL_Node* node)
     avl_update_height(child);
     return child;
 }
-
 
 /**
  * Rebalances the (sub)tree at the given node based on its balance factor.
@@ -267,12 +270,6 @@ void avl_remove_one_subtree(AVL* avl, AVL_Node* r_parent, AVL_Node* r_node)
 
     free(r_node);
 }
-
-
-typedef struct Inorder_S {
-    AVL_Node* parent;
-    AVL_Node* successor;
-} Inorder_S;
 
 /**
  * Finds the inorder successor and its parent. Returns them together in a struct

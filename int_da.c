@@ -135,7 +135,7 @@ void da_remove_at_index(Int_DA* arr, int index)
     // Remove value by shifting to the left and overriding
     for (int i = index; i < arr->size - 1; i++)
 	arr->data[i] = arr->data[i+1];
-    
+
     arr->size--;
 }
 
@@ -212,7 +212,7 @@ int da_pop(Int_DA* arr)
     }
     int val = arr->data[arr->size-1];
     da_remove_at_index(arr, arr->size-1);
-    
+
     return val;
 }
 

@@ -60,6 +60,7 @@ do {\
 /**
  * Converts a static array to a dynamic array
  */
+// TODO: Rewrite and test using typeof()
 #define da_convert(Type, arr, len)\
 ({\
     Type* da_arr = da_init(Type);\
@@ -191,7 +192,7 @@ do {\
 // ------------------ Queue ---------------------------------------------------
 
 /**
- * Alias for appending
+ * Alias for da_append
  */
 #define da_enqueue(arr, val) da_append(arr, val)
 
@@ -220,6 +221,9 @@ do {\
     }\
     arr->data[0];\
 })
+
+// TODO -------------------- Min Heap -----------------------------------------
+
 
 // ------------------------- Print the DA -------------------------------------
 
