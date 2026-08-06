@@ -140,6 +140,16 @@ void da_remove_at_index(Int_DA* arr, int index)
 }
 
 /**
+ * Swaps two elements in the array given their indices
+ */
+void da_swap(Int_DA* arr, int index_1, int index_2)
+{
+    int temp = arr->data[index_1];
+    arr->data[index_1] = arr->data[index_2];
+    arr->data[index_2] = temp;
+}
+
+/**
  * Get a slice!! Returns a new array slice of the given size starting at the
  * given index.
  */

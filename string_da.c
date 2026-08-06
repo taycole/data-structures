@@ -201,3 +201,5 @@ int da_top(Str_DA* arr)
     }
     return arr->data[arr->size-1];;
 }
+
+// TODO: strcat, strcpy,

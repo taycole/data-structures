@@ -109,6 +109,16 @@ do {\
 } while(0)
 
 /**
+ * Swaps two elements in the array given their indices
+ */
+#define da_swap(arr, index_1, index_2)\
+({\
+    typeof(*arr) temp = arr->data[index_1];\
+    arr->data[index_1] = arr->data[index_2];\
+    arr->data[index_2] = temp;\
+})
+
+/**
  * Get a slice!! Returns a new array slice of the given size starting at the
  * given index.
  */
