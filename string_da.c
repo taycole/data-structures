@@ -1,5 +1,7 @@
-// Name: string_da.c
-// Purpose: Implements dynamic arrays for a string datatype.
+// string_da.c
+//
+// Implements dynamic arrays for a string datatype.
+//
 // Author: Taylor Cole
 
 #include <stdio.h>
@@ -21,7 +23,7 @@ typedef struct Str_DA {
 /**
  * Creates an empty dynamic array on the heap with default capacity 4
  */
-Str_DA* da_init(void)
+Str_DA* str_da_init(void)
 {
     Str_DA* new_arr = malloc(sizeof(Str_DA));
     new_arr->size = 0;
@@ -31,16 +33,16 @@ Str_DA* da_init(void)
     return new_arr;
 }
 
-void da_free(Str_DA* da_arr)
+void str_da_free(Str_DA* str_da_arr)
 {
-    free(da_arr->data);
-    free(da_arr);
+    free(str_da_arr->data);
+    free(str_da_arr);
 }
 
 /**
  * Prints array in a simple way for testing
  */
-void da_print(Str_DA* arr)
+void str_da_test_print(Str_DA* arr)
 {
     printf("DA ARR Length: %zu, Capacity: %zu ", arr->size, arr->capacity);
     printf("Data: %s", arr->data);
@@ -48,9 +50,17 @@ void da_print(Str_DA* arr)
 }
 
 /**
+ * Shorthand to print the array without having to remember %.*s
+ */
+void str_da_print(Str_DA* arr)
+{
+    printf("%.*s", (int)arr->size, arr->data);
+}
+
+/**
  * Resize the array when size meets or exceeds current capacity
  */
-void da_resize(Str_DA* arr, int new_capacity)
+void str_da_resize(Str_DA* arr, int new_capacity)
 {
     // Must be a positive integer greater than current size
     if (new_capacity <= 0 || new_capacity < arr->size) {
@@ -64,32 +74,32 @@ void da_resize(Str_DA* arr, int new_capacity)
 /**
  * Adds a new character at the end of the dynamic array
  */
-void da_append(Str_DA* arr, char val)
+void str_da_append(Str_DA* arr, char val)
 {
     if (arr->size == arr->capacity)
-	da_resize(arr, arr->capacity * 2);
+	str_da_resize(arr, arr->capacity * 2);
 
     arr->data[arr->size++] = val;
 }
 
 /**
- * Converts a static integer array to a dynamic integer array
+ * Initialized a dynamic char array using a given static char array and len
  */
-Str_DA* da_convert(char* arr, size_t len)
+Str_DA* str_da_set(char* arr, size_t len)
 {
-    Str_DA* da_arr = da_init();
+    Str_DA* str_da_arr = str_da_init();
 
     // Copy values
     for (int i = 0; i < len; i++) {
-	da_append(da_arr, arr[i]);
+	str_da_append(str_da_arr, arr[i]);
     }
-    return da_arr;
+    return str_da_arr;
 }
 
 /**
  * Inserts a value at the specified index
  */
-void da_insert_at_index(Str_DA* arr, int index, char val)
+void str_da_insert_at_index(Str_DA* arr, int index, char val)
 {
     // Bounds check
     if (index < 0 || index > arr->size)
@@ -97,7 +107,7 @@ void da_insert_at_index(Str_DA* arr, int index, char val)
 
     // If at capacity
     if (arr->size == arr->capacity)
-	da_resize(arr, arr->capacity * 2);
+	str_da_resize(arr, arr->capacity * 2);
 
     // Shift values to the right at insert location
     for (int i = arr->size; i > index; i--) {
@@ -110,7 +120,7 @@ void da_insert_at_index(Str_DA* arr, int index, char val)
 /**
  * Remove the value at the specified index
  */
-void da_remove_at_index(Str_DA* arr, int index)
+void str_da_remove_at_index(Str_DA* arr, int index)
 {
     // Bounds check
     if (index < 0 || index > arr->size)
@@ -120,9 +130,9 @@ void da_remove_at_index(Str_DA* arr, int index)
     if (arr->capacity / 4 > arr->size) {
 	// If size less than 5, defaults to 10 capacity
 	if (arr->size < 5 && arr->capacity > 10)
-	    da_resize(arr, 10);
+	    str_da_resize(arr, 10);
 	else
-	    da_resize(arr, arr->size * 2);
+	    str_da_resize(arr, arr->size * 2);
     }
     // If only one element, remove it and return
     if (arr->size == 1) {
@@ -141,17 +151,17 @@ void da_remove_at_index(Str_DA* arr, int index)
  * Get a slice!! Returns a new array slice of the given size starting at the
  * given index.
  */
-Str_DA* da_slice(Str_DA* arr, int start, int size)
+Str_DA* str_da_slice(Str_DA* arr, int start, int size)
 {
     // Bounds check
     if ((start < 0 || start >= arr->size) ||
 	(size < 0 || size > arr->size - start))
 	return NULL;
 
-    Str_DA* new_arr = da_init();
+    Str_DA* new_arr = str_da_init();
 
     for (int i = 0; i < size; i++)
-	da_insert_at_index(new_arr, i, arr->data[start+i]);
+	str_da_insert_at_index(new_arr, i, arr->data[start+i]);
 
     return new_arr;
 }
@@ -159,47 +169,68 @@ Str_DA* da_slice(Str_DA* arr, int start, int size)
 /**
  * This one slices from between a start and end.
  */
-Str_DA* da_slice_sv(Str_DA* arr, int start, int end)
+Str_DA* str_da_slice_sv(Str_DA* arr, int start, int end)
 {
-    return da_slice(arr, start, end - start + 1);
-}
-
-
-// ------------------- Stack Implementation ----------------------------------
-
-/**
- * Pushes an element onto the stack. Alias for appending.
- */
-void da_push(Str_DA* arr, int val)
-{
-    da_append(arr, val);
+    return str_da_slice(arr, start, end - start + 1);
 }
 
 /**
- * Pops the top element off the stack and returns it (end of dynamic array)
+ * Concatenates src to dest string and returns the pointer to the dest
  */
-int da_pop(Str_DA* arr)
+Str_DA* str_da_cat(Str_DA* dest, const Str_DA* src)
 {
-    if (arr->size == 0) {
-	perror("da_pop: no elements to pop");
-	exit(-1);
+    for(int i = 0; i < src->size; i++) {
+	str_da_append(dest, src->data[i]);
     }
-    int val = arr->data[arr->size-1];
-    da_remove_at_index(arr, arr->size-1);
-
-    return val;
+    return dest;
 }
 
-/**
- * Returns the top value without popping
- */
-int da_top(Str_DA* arr)
+Str_DA* str_da_dup(const Str_DA* src)
 {
-    if (arr->size == 0) {
-	perror("da_top: no elements to look at");
-	exit(-1);
+    Str_DA* new_str = str_da_init();
+
+    for(int i = 0; i < src->size; i++) {
+	str_da_append(new_str, src->data[i]);
     }
-    return arr->data[arr->size-1];;
+    return new_str;
 }
 
-// TODO: strcat, strcpy,
+bool str_da_cmp(const Str_DA* str_1, const Str_DA* str_2)
+{
+    if (str_1->size != str_2->size)
+	return false;
+
+    for (int i = 0; i < str_1->size; i++) {
+	if (str_1->data[i] != str_2->data[i])
+	    return false;
+    }
+    return true;
+}
+
+
+// Test stuff
+/*
+
+int main()
+{
+    char* msg1 = "This is a test!";
+    Str_DA* test = str_da_set(msg1, strlen(msg1));
+
+    char* msg2 = " Is it working???";
+    Str_DA* test2 = str_da_set(msg2, strlen(msg2));
+
+    str_da_cat(test, test2);
+
+    Str_DA* test3 = str_da_dup(test);
+
+    str_da_print(test);
+
+    printf("\nIs this the same?:\n\n");
+
+    str_da_print(test3);
+
+    printf("\nAre they equal? %s", str_da_cmp(test, test3) ? "true" : "false");
+
+    return 0;
+}
+*/
