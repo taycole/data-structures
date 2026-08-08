@@ -9,48 +9,312 @@
 #include <stdbool.h>
 #include <math.h>
 #include "da_macros.c"
-#include "generic_sll.c"
 
+typedef struct Key {
+    const char* data;
+    size_t size;
+} Key;
 
 typedef struct SLL_Node {
     struct SLL_Node* next;
-    char* key;
+    Key* key;
     int value;
 } SLL_Node;
+
+typedef struct SLL {
+    SLL_Node* head;
+    size_t size;
+} SLL;
 
 typedef struct Buckets {
     size_t size;
     size_t capacity;
-    SLL_Node* data;
+    SLL** data;
 } Buckets;
 
 typedef struct Map_MC {
     size_t size;
     size_t capacity;
     Buckets* buckets;
-    int (*hash_function)(char*, int);
+    int (*hash_function)(Key*);
 } Map_MC;
+
+Key keyify(const char* str);
+
+void sll_insert(SLL* sll, Key* key, int val);
+bool sll_remove(SLL* sll, Key* key);
+SLL_Node* sll_contains(SLL* sll, Key* key);
+
+Map_MC* map_mc_init(int (*fptr)(Key*));
+void map_mc_free(Map_MC* map);
+float map_mc_load(Map_MC* map);
+void map_mc_resize(Map_MC* map, int new_capacity);
+void map_mc_put(Map_MC* map, Key* key, int val);
+bool map_mc_contains_key(Map_MC* map, Key* key);
+void map_mc_print(Map_MC* map);
 
 
 bool is_prime(int num);
 int next_prime(int num);
-Map_MC* map_mc_init(int (*fptr)(int));
-void map_mc_free(Map_MC* map);
-float map_mc_load(Map_MC* map);
-void map_mc_resize(Map_MC* map, int new_capacity);
-void map_mc_put(char* key, int key_len, Map_MC* map);
-int hash_function_1(char* s, int len);
-int hash_function_2(char* s, int len);
+int hash_function_1(Key* key);
+int hash_function_2(Key* key);
 
 
 int main()
 {
-    char* test = "This is a test";
-    int result = hash_function_2(test, strlen(test));
-    printf("%d", result);
+    Map_MC* test = map_mc_init(hash_function_1);
+
+    // 35
+    char* key_list[] = {
+	"Lorem",                  // 0
+	"ipsum",		  // 1
+	"dolor",		  // 2
+	"sit",			  // 3
+	"amet",			  // 4
+	"consectetur",		  // 5
+	"adipiscing",		  // 6
+	"elit",			  // 7
+	"Nam",			  // 8
+	"scelerisque",		  // 9
+	"purus",		  // 10
+	"sollicitudin",		  // 11
+	"lacinia",		  // 12
+	"ultrices",		  // 13
+	"lacus",		  // 14
+	"mi",			  // 15
+	"finibus",		  // 16
+	"ipsum",		  // 17 x2
+	"id",			  // 18
+	"cursus",		  // 19
+	"nunc",			  // 20
+	"lorem",		  // 21 x2
+	"et",			  // 22
+	"diam",			  // 23
+	"Donec",		  // 24
+	"nisl",			  // 25
+	"libero",		  // 26
+	"bibendum",		  // 27
+	"sit",			  // 28 x2
+	"amet",			  // 29 x2
+	"vehicula",		  // 30
+	"eget",			  // 31
+	"commodo",		  // 32
+	"ac",			  // 33
+	"sem",			  // 34
+    };
+
+    for (int i = 0; i < 35; i++) {
+	Key* key = malloc(sizeof(Key));
+	*key = keyify(key_list[i]);
+	map_mc_put(test, key, i);
+    }
+
+    map_mc_print(test);
+
+    map_mc_free(test);
+
     return 0;
 }
 
+/**
+ * Convert char* to key
+ */
+Key keyify(const char* str)
+{
+    return (Key) {
+	.data = str,
+	.size = strlen(str),
+    };
+}
+
+
+
+// Functions for the SLL node ------------------------------------------
+
+/**
+ * Inserts a new node at the front of the SLL
+ */
+void sll_insert(SLL* sll, Key* key, int val)
+{
+    SLL_Node* head = malloc(sizeof(SLL_Node));
+    head->key = key;
+    head->value = val;
+    head->next = sll->head;
+    sll->head = head;
+    sll->size++;
+}
+
+/**
+ * Removes the first node with a matching key. Returns true if successful,
+ * false otherwise.
+ */
+bool sll_remove(SLL* sll, Key* key)
+{
+    SLL_Node* prev = NULL;
+    SLL_Node* curr = sll->head;
+
+    while (curr) {
+	if (!strcmp(curr->key->data, key->data)) {
+	    if (prev)
+		prev->next = curr->next;
+	    else
+		sll->head = curr->next;
+	    sll->size--;
+	    free(curr);             // Check if this is working, may not free all
+	    return true;
+	}
+	prev = curr;
+	curr = curr->next;
+    }
+    return false;
+}
+
+/**
+ * Checks if SLL contains a node with the matching key. Returns it or NULL
+ */
+SLL_Node* sll_contains(SLL* sll, Key* key)
+{
+    SLL_Node* curr = sll->head;
+    while (curr) {
+	if (!strcmp(curr->key->data, key->data)) // BUSTED
+	    return curr;
+	curr = curr->next;
+    }
+    return curr; // Will return tail NULL
+}
+
+// Functions for the hash map ------------------------------------------
+
+/**
+ * Initializes map struct with default values
+ */
+Map_MC* map_mc_init(int (*fptr)(Key*))
+{
+    Map_MC* map = malloc(sizeof(Map_MC));
+    map->buckets = da_init(Buckets);
+    map->size = 0;
+    map->capacity = 11;
+    map->hash_function = fptr;
+
+    for (int i = 0; i < map->capacity; i++) {
+	SLL* bucket = malloc(sizeof(SLL));
+	bucket->head = NULL;
+	bucket->size = 0;
+	da_insert_at_index(map->buckets, i, bucket);
+    }
+    return map;
+}
+
+void map_mc_free(Map_MC* map)
+{
+    da_free(map->buckets);
+    free(map);
+}
+
+/**
+ * Updates or adds a key/value pair to the map
+ */
+void map_mc_put(Map_MC* map, Key* key, int val)
+{
+    // Resizes table if the load factor is overlimit
+    if (map_mc_load(map) >= 1.0)
+	map_mc_resize(map, map->capacity * 2);
+
+    // Calculates the index and gets the node at the correct bucket
+    int hash_val = map->hash_function(key);
+    int index = hash_val % map->capacity;
+    SLL_Node* bucket_node = sll_contains(map->buckets->data[index], key);
+
+    // If there isn't a node for the given key, add it, otherwise update
+    if (bucket_node == NULL) {
+	sll_insert(map->buckets->data[index], key, val);
+	map->size++;
+    }
+    else
+	bucket_node->value = val;
+}
+
+/**
+ * Checks if the hash map contains a given key
+
+bool map_mc_contains_key(Map_MC* map, Key* key)
+{
+    int hash_val = map->hash_function(key);
+    int i = hash_val % map->capacity;
+}
+*/
+
+/**
+ * Calculates and returns the load of the table
+ */
+float map_mc_load(Map_MC* map)
+{
+    return (float)map->size / (float)map->capacity;
+}
+
+/**
+ * Increase capacity of the underlying array and rehash the table
+ */
+void map_mc_resize(Map_MC* map, int new_capacity)
+{
+    if (new_capacity < 1)
+	return;
+
+    // Capacity not prime? find next closest prime
+    if (!is_prime(new_capacity))
+	new_capacity = next_prime(new_capacity);
+
+    Buckets* old_buckets = map->buckets;
+    size_t size = map->size;
+
+    // Set new capacity and reset bucket array and size
+    map->capacity = new_capacity;
+    map->buckets = da_init(Buckets);
+    map->size = 0;
+
+    // Reinitialize bucket array with SLLs
+    for (int i = 0; i < map->capacity; i++) {
+	SLL* bucket = malloc(sizeof(SLL));
+	bucket->head = NULL;
+	bucket->size = 0;
+	da_insert_at_index(map->buckets, i, bucket);
+    }
+
+    // Copy values to new hash map
+    int count = 0, bucket_i = 0;
+    while (count < size) {
+	SLL* bucket_sll = old_buckets->data[bucket_i];
+	bucket_i++;
+
+	// For each bucket, iterate through nodes and remap/rehash
+	SLL_Node* curr = bucket_sll->head;
+	while (curr) {
+	    map_mc_put(map, curr->key, curr->value);
+	    curr = curr->next;
+	    count++;
+	}
+    }
+    da_free(old_buckets); // Need to free linked lists as well, rewrite
+}
+
+/**
+ * Prints out the hashmap for testing
+ */
+void map_mc_print(Map_MC* map)
+{
+    for (int i = 0; i < map->capacity; i++) {
+	printf("%d: { ", i);
+	SLL_Node* bucket_curr = map->buckets->data[i]->head;
+	while (bucket_curr) {
+	    printf("%.*s : %d, ",
+		   (int)bucket_curr->key->size,
+		   bucket_curr->key->data,
+		   bucket_curr->value);
+	    bucket_curr = bucket_curr->next;
+	}
+	printf("}\n");
+    }
+}
 
 /**
  * Tests if a given number is a prime number
@@ -85,96 +349,14 @@ int next_prime(int num)
     return num;
 }
 
-Map_MC* map_mc_init(int (*fptr)(char*, int))
-{
-    Map_MC* map = malloc(sizeof(Map_MC));
-    map->buckets = da_init(Buckets);
-    map->size = 0;
-    map->capacity = 11;
-    map->hash_function = fptr;
-    return map;
-}
-
-void map_mc_free(Map_MC* map)
-{
-    da_free(map->buckets);
-    free(map);
-}
-
-
-// TODO finish this ----------------------------------------------------
-
-/**
- * Updates or adds a key/value pair to the map
- */
-void map_mc_put(char* key, int key_len, int val, Map_MC* map)
-{
-    // Resizes table if the load factor is overlimit
-    if (map_mc_load(map) >= 1.0)
-	map_mc_resize(map, map->capacity * 2);
-
-    // Calculates the index and gets the node at the correct bucket
-    int hash_val = map->hash_function(key, key_len);
-    int index = hash_val % map->capacity;
-    
-}
-
-bool contains_key(Map_MC* map, char* key, int key_len);
-
-//----------------------------------------------------------------------
-
-/**
- * Calculates and returns the load of the table
- */
-float map_mc_load(Map_MC* map)
-{
-    return (float)map->size / (float)map->capacity;
-}
-
-/**
- * Increase capacity of the underlying array and rehash the table
- */
-void map_mc_resize(Map_MC* map, int new_capacity)
-{
-    if (new_capacity < 1)
-	return;
-
-    // Capacity not prime? find next closest prime
-    if (!is_prime(new_capacity))
-	new_capacity = next_prime(new_capacity);
-
-    Buckets* old_bucket = map->buckets;
-    size_t size = map->size;
-
-    // Set new capacity and reset bucket array and size
-    map->capacity = new_capacity;
-    map->buckets = da_init(Buckets);
-    map->size = 0;
-
-    // Copy values to new hash map
-    int count = 0, bucket_i = 0;
-    while (count < size) {
-	Buckets* bucket = old_bucket[bucket_i];
-	bucket_i++;
-
-	// For each bucket, iterate through nodes and remap/rehash
-	SLL_Node* curr = bucket->data;
-	while (curr) {
-	    map_mc_put(curr->key, curr->value);
-	    curr = curr->next;
-	    count++;
-	}
-    }
-}
-
 /**
  * Basic hash function for testing
  */
-int hash_function_1(char* s, int len)
+int hash_function_1(Key* key)
 {
     int hash = 0;
-    for (int i = 0; i < len; i++) {
-	char letter = *(s + i);
+    for (int i = 0; i < key->size; i++) {
+	char letter = *(key->data + i);
 	hash += (int)letter;
     }
     return hash;
@@ -183,14 +365,48 @@ int hash_function_1(char* s, int len)
 /**
  * Basic hash function for testing
  */
-int hash_function_2(char* s, int len)
+int hash_function_2(Key* key)
 {
     int hash = 0;
-    for (int i = 0; i < len; i++) {
-	char letter = *(s + i);
+    for (int i = 0; i < key->size; i++) {
+	char letter = *(key->data + i);
 	hash += (i + 1) * (int)letter;
     }
     return hash;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
