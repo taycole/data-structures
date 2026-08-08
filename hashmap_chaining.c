@@ -10,14 +10,9 @@
 #include <math.h>
 #include "da_macros.c"
 
-typedef struct Key {
-    const char* data;
-    size_t size;
-} Key;
-
 typedef struct SLL_Node {
     struct SLL_Node* next;
-    Key* key;
+    const char* key;
     int value;
 } SLL_Node;
 
@@ -36,29 +31,27 @@ typedef struct Map_MC {
     size_t size;
     size_t capacity;
     Buckets* buckets;
-    int (*hash_function)(Key*);
+    int (*hash_function)(const char*);
 } Map_MC;
 
-Key keyify(const char* str);
+void sll_insert(SLL* sll, const char* key, int val);
+bool sll_remove(SLL* sll, const char* key);
+SLL_Node* sll_contains(SLL* sll, const char* key);
 
-void sll_insert(SLL* sll, Key* key, int val);
-bool sll_remove(SLL* sll, Key* key);
-SLL_Node* sll_contains(SLL* sll, Key* key);
-
-Map_MC* map_mc_init(int (*fptr)(Key*));
+Map_MC* map_mc_init(int (*fptr)(const char*));
 void map_mc_free(Map_MC* map);
 float map_mc_load(Map_MC* map);
 void map_mc_resize(Map_MC* map, int new_capacity);
-void map_mc_put(Map_MC* map, const char* key_str, int val);
+void map_mc_put(Map_MC* map, const char* key, int val);
 int map_mc_empty_buckets(Map_MC* map);
-int map_mc_get(Map_MC* map, const char* key_str);
-bool map_mc_contains_key(Map_MC* map, const char* key_str);
+int map_mc_get(Map_MC* map, const char* key);
+bool map_mc_contains_key(Map_MC* map, const char* key);
 void map_mc_test_print(Map_MC* map);
 
 bool is_prime(int num);
 int next_prime(int num);
-int hash_function_1(Key* key);
-int hash_function_2(Key* key);
+int hash_function_1(const char* key);
+int hash_function_2(const char* key);
 
 
 int main()
@@ -121,25 +114,13 @@ int main()
     return 0;
 }
 
-/**
- * Convert char* to key
- */
-Key keyify(const char* str)
-{
-    return (Key) {
-	.data = str,
-	.size = strlen(str),
-    };
-}
-
-
 
 // Functions for the SLL node ------------------------------------------
 
 /**
  * Inserts a new node at the front of the SLL
  */
-void sll_insert(SLL* sll, Key* key, int val)
+void sll_insert(SLL* sll, const char* key, int val)
 {
     SLL_Node* head = malloc(sizeof(SLL_Node));
     head->key = key;
@@ -153,13 +134,13 @@ void sll_insert(SLL* sll, Key* key, int val)
  * Removes the first node with a matching key. Returns true if successful,
  * false otherwise.
  */
-bool sll_remove(SLL* sll, Key* key)
+bool sll_remove(SLL* sll, const char* key)
 {
     SLL_Node* prev = NULL;
     SLL_Node* curr = sll->head;
 
     while (curr) {
-	if (!strcmp(curr->key->data, key->data)) {
+	if (!strcmp(curr->key, key)) {
 	    if (prev)
 		prev->next = curr->next;
 	    else
@@ -177,11 +158,11 @@ bool sll_remove(SLL* sll, Key* key)
 /**
  * Checks if SLL contains a node with the matching key. Returns it or NULL
  */
-SLL_Node* sll_contains(SLL* sll, Key* key)
+SLL_Node* sll_contains(SLL* sll, const char* key)
 {
     SLL_Node* curr = sll->head;
     while (curr) {
-	if (!strcmp(curr->key->data, key->data)) // BUSTED
+	if (!strcmp(curr->key, key))
 	    return curr;
 	curr = curr->next;
     }
@@ -193,7 +174,7 @@ SLL_Node* sll_contains(SLL* sll, Key* key)
 /**
  * Initializes map struct with default values
  */
-Map_MC* map_mc_init(int (*fptr)(Key*))
+Map_MC* map_mc_init(int (*fptr)(const char*))
 {
     Map_MC* map = malloc(sizeof(Map_MC));
     map->buckets = da_init(Buckets);
@@ -219,11 +200,8 @@ void map_mc_free(Map_MC* map)
 /**
  * Updates or adds a key/value pair to the map
  */
-void map_mc_put(Map_MC* map, const char* key_str, int val)
+void map_mc_put(Map_MC* map, const char* key, int val)
 {
-    Key* key = malloc(sizeof(Key));
-    *key = keyify(key_str);
-
     // Resizes table if the load factor is overlimit
     if (map_mc_load(map) >= 1.0)
 	map_mc_resize(map, map->capacity * 2);
@@ -259,13 +237,11 @@ int map_mc_empty_buckets(Map_MC* map)
 /**
  * Get the value at the key
  */
-int map_mc_get(Map_MC* map, const char* key_str)
+int map_mc_get(Map_MC* map, const char* key)
 {
-    Key key = keyify(key_str);
-
-    int hash_val = map->hash_function(&key);
+    int hash_val = map->hash_function(key);
     int index = hash_val % map->capacity;
-    SLL_Node* node = sll_contains(map->buckets->data[index], &key);
+    SLL_Node* node = sll_contains(map->buckets->data[index], key);
     if (node)
 	return node->value;
     else {
@@ -277,13 +253,11 @@ int map_mc_get(Map_MC* map, const char* key_str)
 /**
  * Checks if the hash map contains a given key
  */
-bool map_mc_contains_key(Map_MC* map, const char* key_str)
+bool map_mc_contains_key(Map_MC* map, const char* key)
 {
-    Key key = keyify(key_str);
-
-    int hash_val = map->hash_function(&key);
+    int hash_val = map->hash_function(key);
     int index = hash_val % map->capacity;
-    SLL_Node* node = sll_contains(map->buckets->data[index], &key);
+    SLL_Node* node = sll_contains(map->buckets->data[index], key);
     if (node)
 	return true;
 
@@ -335,7 +309,7 @@ void map_mc_resize(Map_MC* map, int new_capacity)
 	// For each bucket, iterate through nodes and remap/rehash
 	SLL_Node* curr = bucket_sll->head;
 	while (curr) {
-	    map_mc_put(map, curr->key->data, curr->value);
+	    map_mc_put(map, curr->key, curr->value);
 	    curr = curr->next;
 	    count++;
 	}
@@ -354,10 +328,7 @@ void map_mc_test_print(Map_MC* map)
 	printf("%d: { ", i);
 	SLL_Node* bucket_curr = map->buckets->data[i]->head;
 	while (bucket_curr) {
-	    printf("%.*s : %d, ",
-		   (int)bucket_curr->key->size,
-		   bucket_curr->key->data,
-		   bucket_curr->value);
+	    printf("%s : %d, ", bucket_curr->key, bucket_curr->value);
 	    bucket_curr = bucket_curr->next;
 	}
 	printf("}\n");
@@ -400,11 +371,11 @@ int next_prime(int num)
 /**
  * Basic hash function for testing
  */
-int hash_function_1(Key* key)
+int hash_function_1(const char* key)
 {
     int hash = 0;
-    for (int i = 0; i < key->size; i++) {
-	char letter = *(key->data + i);
+    for (int i = 0; i < strlen(key); i++) {
+	char letter = key[i];
 	hash += (int)letter;
     }
     return hash;
@@ -413,11 +384,11 @@ int hash_function_1(Key* key)
 /**
  * Second basic hash function for testing
  */
-int hash_function_2(Key* key)
+int hash_function_2(const char* key)
 {
     int hash = 0;
-    for (int i = 0; i < key->size; i++) {
-	char letter = *(key->data + i);
+    for (int i = 0; i < strlen(key); i++) {
+	char letter = key[i];
 	hash += (i + 1) * (int)letter;
     }
     return hash;
