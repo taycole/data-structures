@@ -49,10 +49,11 @@ Map_MC* map_mc_init(int (*fptr)(Key*));
 void map_mc_free(Map_MC* map);
 float map_mc_load(Map_MC* map);
 void map_mc_resize(Map_MC* map, int new_capacity);
-void map_mc_put(Map_MC* map, Key* key, int val);
-bool map_mc_contains_key(Map_MC* map, Key* key);
-void map_mc_print(Map_MC* map);
-
+void map_mc_put(Map_MC* map, const char* key_str, int val);
+int map_mc_empty_buckets(Map_MC* map);
+int map_mc_get(Map_MC* map, const char* key_str);
+bool map_mc_contains_key(Map_MC* map, const char* key_str);
+void map_mc_test_print(Map_MC* map);
 
 bool is_prime(int num);
 int next_prime(int num);
@@ -87,7 +88,7 @@ int main()
 	"id",			  // 18
 	"cursus",		  // 19
 	"nunc",			  // 20
-	"lorem",		  // 21 x2
+	"Lorem",		  // 21 x2
 	"et",			  // 22
 	"diam",			  // 23
 	"Donec",		  // 24
@@ -104,12 +105,16 @@ int main()
     };
 
     for (int i = 0; i < 35; i++) {
-	Key* key = malloc(sizeof(Key));
-	*key = keyify(key_list[i]);
-	map_mc_put(test, key, i);
+	map_mc_put(test, key_list[i], i);
     }
 
-    map_mc_print(test);
+    map_mc_test_print(test);
+
+    printf("\n\nNumber of empty buckets: %d\n\n", map_mc_empty_buckets(test));
+
+    printf("Get test - key: %s, val: %d\n\n", "Lorem", map_mc_get(test, "Lorem"));
+    printf("Map contains key %s: %d\n", "Lorem", map_mc_contains_key(test, "Lorem"));
+    printf("Map contains key %s: %d\n", "dog", map_mc_contains_key(test, "dog"));
 
     map_mc_free(test);
 
@@ -214,8 +219,11 @@ void map_mc_free(Map_MC* map)
 /**
  * Updates or adds a key/value pair to the map
  */
-void map_mc_put(Map_MC* map, Key* key, int val)
+void map_mc_put(Map_MC* map, const char* key_str, int val)
 {
+    Key* key = malloc(sizeof(Key));
+    *key = keyify(key_str);
+
     // Resizes table if the load factor is overlimit
     if (map_mc_load(map) >= 1.0)
 	map_mc_resize(map, map->capacity * 2);
@@ -235,14 +243,52 @@ void map_mc_put(Map_MC* map, Key* key, int val)
 }
 
 /**
- * Checks if the hash map contains a given key
-
-bool map_mc_contains_key(Map_MC* map, Key* key)
+ * Gets the number of empty buckets in the hash map
+ */
+int map_mc_empty_buckets(Map_MC* map)
 {
-    int hash_val = map->hash_function(key);
-    int i = hash_val % map->capacity;
+    int count = 0;
+    for (int i = 0; i < map->buckets->size; i++) {
+	SLL* bucket = map->buckets->data[i];
+	if (bucket->size == 0)
+	    count++;
+    }
+    return count;
 }
-*/
+
+/**
+ * Get the value at the key
+ */
+int map_mc_get(Map_MC* map, const char* key_str)
+{
+    Key key = keyify(key_str);
+
+    int hash_val = map->hash_function(&key);
+    int index = hash_val % map->capacity;
+    SLL_Node* node = sll_contains(map->buckets->data[index], &key);
+    if (node)
+	return node->value;
+    else {
+	perror("key not found");
+	return -1;
+    }
+}
+
+/**
+ * Checks if the hash map contains a given key
+ */
+bool map_mc_contains_key(Map_MC* map, const char* key_str)
+{
+    Key key = keyify(key_str);
+
+    int hash_val = map->hash_function(&key);
+    int index = hash_val % map->capacity;
+    SLL_Node* node = sll_contains(map->buckets->data[index], &key);
+    if (node)
+	return true;
+
+    return false;
+}
 
 /**
  * Calculates and returns the load of the table
@@ -289,7 +335,7 @@ void map_mc_resize(Map_MC* map, int new_capacity)
 	// For each bucket, iterate through nodes and remap/rehash
 	SLL_Node* curr = bucket_sll->head;
 	while (curr) {
-	    map_mc_put(map, curr->key, curr->value);
+	    map_mc_put(map, curr->key->data, curr->value);
 	    curr = curr->next;
 	    count++;
 	}
@@ -297,10 +343,12 @@ void map_mc_resize(Map_MC* map, int new_capacity)
     da_free(old_buckets); // Need to free linked lists as well, rewrite
 }
 
+// Functions for testing --------------------------------------------------
+
 /**
  * Prints out the hashmap for testing
  */
-void map_mc_print(Map_MC* map)
+void map_mc_test_print(Map_MC* map)
 {
     for (int i = 0; i < map->capacity; i++) {
 	printf("%d: { ", i);
@@ -363,7 +411,7 @@ int hash_function_1(Key* key)
 }
 
 /**
- * Basic hash function for testing
+ * Second basic hash function for testing
  */
 int hash_function_2(Key* key)
 {
