@@ -45,6 +45,7 @@ void map_mc_resize(Map_MC* map, int new_capacity);
 void map_mc_put(Map_MC* map, const char* key, int val);
 int map_mc_empty_buckets(Map_MC* map);
 int map_mc_get(Map_MC* map, const char* key);
+void map_mc_remove(Map_MC* map, const char* key);
 bool map_mc_contains_key(Map_MC* map, const char* key);
 void map_mc_test_print(Map_MC* map);
 
@@ -109,6 +110,11 @@ int main()
     printf("Map contains key %s: %d\n", "Lorem", map_mc_contains_key(test, "Lorem"));
     printf("Map contains key %s: %d\n", "dog", map_mc_contains_key(test, "dog"));
 
+    printf("Removing %s!\n", "Lorem");
+    map_mc_remove(test, "Lorem");
+
+    printf("Map contains key %s: %d\n", "Lorem", map_mc_contains_key(test, "Lorem"));
+
     map_mc_free(test);
 
     return 0;
@@ -155,6 +161,17 @@ bool sll_remove(SLL* sll, const char* key)
     return false;
 }
 
+void sll_free(SLL* sll)
+{
+    SLL_Node* curr = sll->head;
+    while (curr) {
+	SLL_Node* node = curr;
+	curr = curr->next;
+	free(node);
+    }
+    free(sll);
+}
+
 /**
  * Checks if SLL contains a node with the matching key. Returns it or NULL
  */
@@ -193,6 +210,10 @@ Map_MC* map_mc_init(int (*fptr)(const char*))
 
 void map_mc_free(Map_MC* map)
 {
+    for (int i = 0; i < map->capacity; i++) {
+	SLL* bucket = map->buckets->data[i];
+	sll_free(bucket);
+    }
     da_free(map->buckets);
     free(map);
 }
@@ -265,6 +286,19 @@ bool map_mc_contains_key(Map_MC* map, const char* key)
 }
 
 /**
+ * Removes key/value pair from the hash map if found
+ */
+void map_mc_remove(Map_MC* map, const char* key)
+{
+    int hash_val = map->hash_function(key);
+    int index = hash_val % map->capacity;
+    bool result = sll_remove(map->buckets->data[index], key);
+
+    if (result)
+	map->size--;
+}
+
+/**
  * Calculates and returns the load of the table
  */
 float map_mc_load(Map_MC* map)
@@ -285,7 +319,8 @@ void map_mc_resize(Map_MC* map, int new_capacity)
 	new_capacity = next_prime(new_capacity);
 
     Buckets* old_buckets = map->buckets;
-    size_t size = map->size;
+    size_t old_size = map->size;
+    size_t old_capacity = map->capacity;
 
     // Set new capacity and reset bucket array and size
     map->capacity = new_capacity;
@@ -302,7 +337,7 @@ void map_mc_resize(Map_MC* map, int new_capacity)
 
     // Copy values to new hash map
     int count = 0, bucket_i = 0;
-    while (count < size) {
+    while (count < old_size) {
 	SLL* bucket_sll = old_buckets->data[bucket_i];
 	bucket_i++;
 
@@ -313,6 +348,10 @@ void map_mc_resize(Map_MC* map, int new_capacity)
 	    curr = curr->next;
 	    count++;
 	}
+    }
+    for (int i = 0; i < old_capacity; i++) {
+	SLL* bucket = old_buckets->data[i];
+	sll_free(bucket);
     }
     da_free(old_buckets); // Need to free linked lists as well, rewrite
 }
