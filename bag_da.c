@@ -17,10 +17,10 @@ void bag_add(Int_DA* bag, int val)
 bool bag_remove(Int_DA* bag, int val)
 {
     for (int i = 0; i < bag->size; i++) {
-	if (bag->data[i] == val) {
-	    da_remove_at_index(bag, i);
-	    return true;
-	}
+        if (bag->data[i] == val) {
+            da_remove_at_index(bag, i);
+            return true;
+        }
     }
     return false;
 }
@@ -32,8 +32,8 @@ int count(Int_DA* bag, int val)
 {
     int val_count = 0;
     for (int i = 0; i < bag->size; i++) {
-	if (bag->data[i] == val)
-	    val_count++;
+        if (bag->data[i] == val)
+            val_count++;
     }
     return val_count;
 }
@@ -55,16 +55,16 @@ void clear(Int_DA* bag)
 bool equal(Int_DA* bag_1, Int_DA* bag_2)
 {
     if (bag_1->size != bag_2->size)
-	return false;
+        return false;
 
     if (bag_1->size == 0 && bag_2->size == 0)
-	return true;
+        return true;
 
     for (int i = 0; i < bag_1->size; i++) {
-	int count_1 = count(bag_1, bag_1->data[i]);
-	int count_2 = count(bag_2, bag_2->data[i]);
-	if (count_1 != count_2)
-	    return false;
+        int count_1 = count(bag_1, bag_1->data[i]);
+        int count_2 = count(bag_2, bag_2->data[i]);
+        if (count_1 != count_2)
+            return false;
     }
     return true;
 }

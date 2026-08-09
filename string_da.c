@@ -201,8 +201,8 @@ bool str_da_cmp(const Str_DA* str_1, const Str_DA* str_2)
         return false;
 
     for (int i = 0; i < str_1->size; i++) {
-	if (str_1->data[i] != str_2->data[i])
-	    return false;
+        if (str_1->data[i] != str_2->data[i])
+            return false;
     }
     return true;
 }

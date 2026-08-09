@@ -33,9 +33,9 @@ void sll_free(Int_SLL* q)
 {
     Int_Node* curr = q->head, next_node;
     while (curr) {
-	next_node = curr->next;
-	free(curr);
-	curr = next_node;
+        next_node = curr->next;
+        free(curr);
+        curr = next_node;
     }
     free(q);
 }
@@ -60,8 +60,8 @@ int sll_size(Int_SLL* q)
     int len = 0;
 
     while (node) {
-	len++;
-	node = node->next;
+        len++;
+        node = node->next;
     }
     return len;
 }
@@ -96,8 +96,8 @@ int sll_pop(Int_SLL* sll)
 int sll_peek(Int_SLL* sll)
 {
     if (sll->head == NULL) {
-	perror("sll empty");
-	return -1;
+        perror("sll empty");
+        return -1;
     }
     return sll->head->value;
 }
@@ -111,8 +111,8 @@ int sll_peek(Int_SLL* sll)
 void enqueue(Int_SLL* q, int val)
 {
     if (q->tail == NULL) {
-	q->head = sll_new_node(val);
-	q->tail = q->head;
+        q->head = sll_new_node(val);
+        q->tail = q->head;
     }
     else {
         q->tail->next = sll_new_node(val);
@@ -126,8 +126,8 @@ void enqueue(Int_SLL* q, int val)
 int dequeue(Int_SLL* q)
 {
     if (q->head == NULL) {
-	perror("queue empty");
-	return -1;
+        perror("queue empty");
+        return -1;
     }
     int val = q->head->value;
     q->head = q->head->next;
@@ -142,7 +142,7 @@ void sll_print(Int_SLL* q)
 {
     Int_Node* curr = q->head;
     while (curr) {
-	printf("Q(%d) -> ", curr->value);
-	curr = curr->next;
+        printf("Q(%d) -> ", curr->value);
+        curr = curr->next;
     }
 }

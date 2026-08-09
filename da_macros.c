@@ -42,8 +42,8 @@ do {\
 #define da_resize(array, new_capacity)\
 do {\
     if (new_capacity > 0 && new_capacity >= array->size) {\
-	array->data = realloc(array->data, new_capacity * sizeof(*array->data));\
-	array->capacity = new_capacity;\
+        array->data = realloc(array->data, new_capacity * sizeof(*array->data));\
+        array->capacity = new_capacity;\
     }\
 } while(0)
 
@@ -53,7 +53,7 @@ do {\
 #define da_append(array, val)\
 do {\
     if (array->size == array->capacity)\
-	da_resize(array, array->capacity * 2);\
+        da_resize(array, array->capacity * 2);\
     array->data[array->size++] = val;\
 } while(0)
 
@@ -65,7 +65,7 @@ do {\
 ({\
     Type* da_arr = da_init(Type);\
     for (int i = 0; i < len; i++)\
-	da_append(da_arr, arr[i]);\
+        da_append(da_arr, arr[i]);\
     da_arr;\
 })
 
@@ -75,13 +75,13 @@ do {\
 #define da_insert_at_index(da_arr, index, val)\
 do {\
     if (index >= 0 && index <= da_arr->size) {\
-	if (da_arr->size == da_arr->capacity)\
-	    da_resize(da_arr, da_arr->capacity * 2);\
-	for (int i = da_arr->size; i > index; i--) {\
-	    da_arr->data[i] = da_arr->data[i-1];\
-	}\
-	da_arr->data[index] = val;\
-	da_arr->size++;\
+        if (da_arr->size == da_arr->capacity)\
+            da_resize(da_arr, da_arr->capacity * 2);\
+        for (int i = da_arr->size; i > index; i--) {\
+            da_arr->data[i] = da_arr->data[i-1];\
+        }\
+        da_arr->data[index] = val;\
+        da_arr->size++;\
     }\
 } while(0)
 
@@ -91,20 +91,20 @@ do {\
 #define da_remove_at_index(arr, index)\
 do {\
     if (index >= 0 && index <= arr->size) {\
-	if (arr->capacity / 4 > arr->size) {\
-	    if (arr->size < 5 && arr->capacity > 10)\
-		da_resize(arr, 10);\
-	    else\
-		da_resize(arr, arr->size * 2);\
-	}\
-	if (arr->size == 1) {\
-	    arr->size--;\
-	}\
-	else {\
-	    for (int i = index; i < arr->size - 1; i++)\
-		arr->data[i] = arr->data[i+1];\
-	    arr->size--;\
-	}\
+        if (arr->capacity / 4 > arr->size) {\
+            if (arr->size < 5 && arr->capacity > 10)\
+                da_resize(arr, 10);\
+            else\
+                da_resize(arr, arr->size * 2);\
+        }\
+        if (arr->size == 1) {\
+            arr->size--;\
+        }\
+        else {\
+            for (int i = index; i < arr->size - 1; i++)\
+                arr->data[i] = arr->data[i+1];\
+            arr->size--;\
+        }\
     }\
 } while(0)
 
@@ -126,11 +126,11 @@ do {\
 ({\
     typeof(arr) new_arr = da_init(typeof(*arr));\
     if ((start < 0 || start >= arr->size) ||\
-	(slice_size < 0 || slice_size > arr->size - start))\
-	new_arr->data = NULL;\
+        (slice_size < 0 || slice_size > arr->size - start))\
+        new_arr->data = NULL;\
     else {\
-	for (int i = 0; i < slice_size; i++)\
-	    da_insert_at_index(new_arr, i, arr->data[start+i]);\
+        for (int i = 0; i < slice_size; i++)\
+            da_insert_at_index(new_arr, i, arr->data[start+i]);\
     }\
     new_arr;\
 })
@@ -149,7 +149,7 @@ do {\
 ({\
     typeof(arr) new_arr = da_init(typeof(*arr));\
     for (int i = 0; i < arr->size; i++)\
-	da_append(new_arr, func(arr->data[i]));\
+        da_append(new_arr, func(arr->data[i]));\
     new_arr;\
 })
 
@@ -160,8 +160,8 @@ do {\
 ({\
     typeof(arr) new_arr = da_init(typeof(*arr));\
     for (int i = 0; i < arr->size; i++) {\
-	if (func(arr->data[i]) == true)\
-	    da_append(new_arr, arr->data[i]);\
+        if (func(arr->data[i]) == true)\
+            da_append(new_arr, arr->data[i]);\
     }\
     new_arr;\
 })
@@ -179,8 +179,8 @@ do {\
 #define da_pop(arr)\
 ({\
     if (arr->size == 0) {\
-	perror("da_pop: no elements to pop");\
-	exit(-1);\
+        perror("da_pop: no elements to pop");\
+        exit(-1);\
     }\
     typeof(arr->data[0]) val = arr->data[arr->size-1];\
     da_remove_at_index(arr, arr->size-1);\
@@ -193,8 +193,8 @@ do {\
 #define da_top(arr)\
 ({\
     if (arr->size == 0) {\
-	perror("da_top: no elements to look at");\
-	exit(-1);\
+        perror("da_top: no elements to look at");\
+        exit(-1);\
     }\
     arr->data[arr->size-1];\
 })
@@ -212,8 +212,8 @@ do {\
 #define da_dequeue(arr)\
 ({\
     if (arr->size == 0) {\
-	perror("da_dequeue: no elements to dequeue");\
-	exit(-1);\
+        perror("da_dequeue: no elements to dequeue");\
+        exit(-1);\
     }\
     typeof(arr->data[0]) val = arr->data[0];\
     da_remove_at_index(arr, 0);\
@@ -226,8 +226,8 @@ do {\
 #define da_peek(arr)\
 ({\
     if (arr->size == 0) {\
-	perror("da_peek: no elements to peek at");\
-	exit(-1);\
+        perror("da_peek: no elements to peek at");\
+        exit(-1);\
     }\
     arr->data[0];\
 })
@@ -244,6 +244,6 @@ do {\
 ({\
     printf("( ");\
     for (int i = 0; i < arr->size; i++)\
-	printf(format_str, arr->data[i]);\
+        printf(format_str, arr->data[i]);\
     printf(")\n");\
 })

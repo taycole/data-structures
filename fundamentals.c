@@ -105,9 +105,9 @@ int main()
     
     for (int i = 0; i < 9; i++) {
         int *rotated_arr = rotate(rotate_test, 6, steps[i]);
-	printf("Steps: %d ", steps[i]);
+        printf("Steps: %d ", steps[i]);
         print_int_array(rotated_arr, 6);
-	free(rotated_arr);
+        free(rotated_arr);
     }
     print_int_array(rotate_test, 6);
     
@@ -116,10 +116,10 @@ int main()
     printf("\nsa_range tests\n");
     int cases[] = {1, 3, -1, 2, 0, 0, 0, -3, -95, -89, -89, -95};
     for (int i = 0; i < 12; i += 2) {
-	printf("%d to %d:  ", cases[i], cases[i+1]);
+        printf("%d to %d:  ", cases[i], cases[i+1]);
         int *sa_arr = sa_range(cases[i], cases[i+1]);
         print_int_array(sa_arr, (abs(cases[i] - cases[i + 1]) + 1));
-	free(sa_arr);
+        free(sa_arr);
     }
     // -----------------------------------------------------------------------
     // is_int_sorted
@@ -144,7 +144,7 @@ int main()
         print_int_array(sort_test_cases[i], sort_test_lens[i]);
         printf("  Result: %d",
                is_int_sorted(sort_test_cases[i], sort_test_lens[i]));
-	printf("\n");
+        printf("\n");
     }
     // -----------------------------------------------------------------------
     // find_mode
@@ -166,24 +166,24 @@ int main()
     // -----------------------------------------------------------------------
     // remove_duplicates
     Int_Arr rm_dup_test1 = {.count = 1, .data = {1}},
-	    rm_dup_test2 = {.count = 2, .data = {1, 2}},
-	    rm_dup_test3 = {.count = 3, .data = {1, 1, 2}},
-	    rm_dup_test4 = {.count = 7, .data = {1, 20, 30, 40, 500, 500, 500}},
-	    rm_dup_test5 = {.count = 9, .data = {5, 5, 5, 4, 4, 3, 2, 1, 1}},
-	    rm_dup_test6 = {.count = 8, .data = {1, 1, 1, 1, 2, 2, 2, 2}};
+            rm_dup_test2 = {.count = 2, .data = {1, 2}},
+            rm_dup_test3 = {.count = 3, .data = {1, 1, 2}},
+            rm_dup_test4 = {.count = 7, .data = {1, 20, 30, 40, 500, 500, 500}},
+            rm_dup_test5 = {.count = 9, .data = {5, 5, 5, 4, 4, 3, 2, 1, 1}},
+            rm_dup_test6 = {.count = 8, .data = {1, 1, 1, 1, 2, 2, 2, 2}};
     
     Int_Arr rm_dup_tests[6] = {
-	rm_dup_test1,
-	rm_dup_test2,
-	rm_dup_test3,
-	rm_dup_test4,
-	rm_dup_test5,
-	rm_dup_test6,
+        rm_dup_test1,
+        rm_dup_test2,
+        rm_dup_test3,
+        rm_dup_test4,
+        rm_dup_test5,
+        rm_dup_test6,
     };
 
     for (int i = 0; i < 6; i++) {
-	int* new_arr = remove_duplicates(rm_dup_tests[i].data, rm_dup_tests[i].count);
-	print_int_array(new_arr, rm_dup_tests[i].count);
+        int* new_arr = remove_duplicates(rm_dup_tests[i].data, rm_dup_tests[i].count);
+        print_int_array(new_arr, rm_dup_tests[i].count);
     }
     printf("\n");
     
@@ -191,27 +191,27 @@ int main()
     // count_sort
     printf("Time for the big ones! COUNT SORT:\n\n");
     Int_Arr count_sort_test1 = {.count = 5, .data = {1, 2, 4, 3, 5}},
-	count_sort_test2 = {.count = 5, .data = {5, 4, 3, 2, 1}},
-	count_sort_test3 = {.count = 7, .data = {0, -5, -3, -4, -2, -1, 0}},
-	count_sort_test4 = {.count = 7, .data = {-3, -2, -1, 0, 1, 2, 3}},
-	count_sort_test5 = {.count = 12, .data = {1, 2, 3, 4, 3, 2, 1, 5, 5, 2, 3, 1}},
-	count_sort_test6 = {.count = 4, .data = {10100, 10721, 10320, 10998}},
-	count_sort_test7 = {.count = 4, .data = {-100320, -100450, -100999, -100001}};
+        count_sort_test2 = {.count = 5, .data = {5, 4, 3, 2, 1}},
+        count_sort_test3 = {.count = 7, .data = {0, -5, -3, -4, -2, -1, 0}},
+        count_sort_test4 = {.count = 7, .data = {-3, -2, -1, 0, 1, 2, 3}},
+        count_sort_test5 = {.count = 12, .data = {1, 2, 3, 4, 3, 2, 1, 5, 5, 2, 3, 1}},
+        count_sort_test6 = {.count = 4, .data = {10100, 10721, 10320, 10998}},
+        count_sort_test7 = {.count = 4, .data = {-100320, -100450, -100999, -100001}};
 
     Int_Arr count_sort_tests[7] = {
-	count_sort_test1,
-	count_sort_test2,
-	count_sort_test3,
-	count_sort_test4,
-	count_sort_test5,
-	count_sort_test6,
-	count_sort_test7,
+        count_sort_test1,
+        count_sort_test2,
+        count_sort_test3,
+        count_sort_test4,
+        count_sort_test5,
+        count_sort_test6,
+        count_sort_test7,
     };
 
     for (int i = 0; i < 7; i++) {
-	Int_Arr* result = count_sort(count_sort_tests[i].data, count_sort_tests[i].count);
-	print_int_array(count_sort_tests[i].data, count_sort_tests[i].count);
-	print_int_array(result->data, result->count);
+        Int_Arr* result = count_sort(count_sort_tests[i].data, count_sort_tests[i].count);
+        print_int_array(count_sort_tests[i].data, count_sort_tests[i].count);
+        print_int_array(result->data, result->count);
     }
     printf("\n");
         
@@ -232,7 +232,7 @@ void print_int_array(int *arr, int len)
 {
     printf("Array: { ");
     for (int i = 0; i < len; i++) {
-	printf("%d ", *(arr + i));
+        printf("%d ", *(arr + i));
     }
     printf("}\n");
 }
@@ -242,7 +242,7 @@ void print_str_array(char **arr, int len)
 {
     printf("Str Array { ");
     for (int i = 0; i < len; i++) {
-	printf("%s ", arr[i]);
+        printf("%s ", arr[i]);
     }
     printf("}\n");
 }
@@ -264,7 +264,7 @@ struct min_max get_min_max(int *arr, int len)
         if (curr_val > current_max)
             current_max = curr_val;
         if (curr_val < current_min)
-	    current_min = curr_val;
+            current_min = curr_val;
     }
     struct min_max result = {current_min, current_max};
     return result;
@@ -283,17 +283,17 @@ char **fizz_buzz(int *arr, int len)
 {
     char **new_arr = calloc(len, sizeof(char*));
     for (int i = 0; i < len; i++) {
-	char *str_val = calloc(12, sizeof(char));
+        char *str_val = calloc(12, sizeof(char));
         if (arr[i] % 15 == 0) {
-	    strcpy(str_val, "'fizzbuzz'");
+            strcpy(str_val, "'fizzbuzz'");
         } else if (arr[i] % 3 == 0) {
-	    strcpy(str_val, "'fizz'");
+            strcpy(str_val, "'fizz'");
         } else if (arr[i] % 5 == 0) {
-	    strcpy(str_val, "'buzz'");
+            strcpy(str_val, "'buzz'");
         } else if (arr[i] < 0) {
-	    snprintf(str_val, 12, "-%d", abs(arr[i]));
+            snprintf(str_val, 12, "-%d", abs(arr[i]));
         } else {
-	    snprintf(str_val, 12, "%d", abs(arr[i]));
+            snprintf(str_val, 12, "%d", abs(arr[i]));
         }
         new_arr[i] = str_val;
     }
@@ -303,7 +303,7 @@ char **fizz_buzz(int *arr, int len)
 void free_fizzbuzz(char **ptr_arr, int len)
 {
     for (int i = 0; i < len; i++) {
-	free(ptr_arr[i]);
+        free(ptr_arr[i]);
     }
     free(ptr_arr);
 }
@@ -321,7 +321,7 @@ void reverse(int *arr, int len)
     for (int i = 0; i < len / 2; i++) {
         tmp = arr[i];
         arr[i] = arr[len - 1 - i];
-	arr[len - 1 - i] = tmp;
+        arr[len - 1 - i] = tmp;
     }
 }
 
@@ -347,7 +347,7 @@ int *rotate(int *arr, int len, int steps)
         adj_steps = len - adj_steps;
 
     for (int i = 0; i < len; i++)
-	new_arr[((i + adj_steps) % len)] = arr[i];
+        new_arr[((i + adj_steps) % len)] = arr[i];
 
     return new_arr;
 }
@@ -373,7 +373,7 @@ int *sa_range(int start, int end)
 
     // Fills in the middle values
     for (int i = 1; i < arr_len - 1; i++) {
-	arr[i] = start + n * i;
+        arr[i] = start + n * i;
     }
     return arr;
 }
@@ -409,7 +409,7 @@ int is_int_sorted(int *arr, int len)
         // Breaks loop if expected order incorrect
         if ((arr_order == 1 && (arr[i - 1] >= arr[i])) ||
             (arr_order == -1 && (arr[i - 1] <= arr[i])))
-	    return 0;
+            return 0;
     }
     return arr_order;
 }
@@ -427,15 +427,15 @@ Int_Mode int_find_mode(int *arr, int len)
 
     // Iterate through the rest, updating variables as it goes
     for (int i = 1; i < len; i++) {
-	if (arr[i] != arr[i-1])
-	    curr = 1;
-	else
-	    curr++;
+        if (arr[i] != arr[i-1])
+            curr = 1;
+        else
+            curr++;
 
-	if (curr > high_count) {
-	    high_val = arr[i];
-	    high_count = curr;
-	}
+        if (curr > high_count) {
+            high_val = arr[i];
+            high_count = curr;
+        }
     }
 
     return (Int_Mode) {.count = high_count, .mode = high_val};
@@ -454,15 +454,15 @@ Str_Mode str_find_mode(char** arr, int len)
 
     // Iterate through the rest, updating variables as it goes
     for (int i = 1; i < len; i++) {
-	if (strcmp(arr[i], arr[i-1]))
-	    curr = 1;
-	else
-	    curr++;
+        if (strcmp(arr[i], arr[i-1]))
+            curr = 1;
+        else
+            curr++;
 
-	if (curr > high_count) {
-	    high_val = arr[i];
-	    high_count = curr;
-	}
+        if (curr > high_count) {
+            high_val = arr[i];
+            high_count = curr;
+        }
     }
 
     return (Str_Mode) {.count = high_count, .mode = high_val};
@@ -480,10 +480,10 @@ int* remove_duplicates(int* arr, int len)
     int new_arr_count = 1;
 
     for (int i = 1; i < len; i++) {
-	if (arr[i] != arr[i-1]) {
-	    new_arr[new_arr_count] = arr[i];
-	    new_arr_count++;
-	}
+        if (arr[i] != arr[i-1]) {
+            new_arr[new_arr_count] = arr[i];
+            new_arr_count++;
+        }
     }
     return new_arr;
 }
@@ -499,10 +499,10 @@ Int_Arr* count_sort(int* arr, int len)
 
     // Build the count array
     for (int i = 0; i < len; i++) {
-	if (count_arr[arr[i] - min_val] == 0)
-	    count_arr[arr[i] - min_val] = 1;
-	else
-	    count_arr[arr[i] - min_val]++;
+        if (count_arr[arr[i] - min_val] == 0)
+            count_arr[arr[i] - min_val] = 1;
+        else
+            count_arr[arr[i] - min_val]++;
     }
 
     // Create the complimentary array for building a new list
@@ -512,18 +512,18 @@ Int_Arr* count_sort(int* arr, int len)
 
     // Each new index value is a sum of the previous index values
     for (int i = 1; i < NELEMS(count_arr); i++) {
-	temp_sum += count_arr[i];
-	comp_count[i] = temp_sum;
+        temp_sum += count_arr[i];
+        comp_count[i] = temp_sum;
     }
 
     // Build sorted list using complimentary array count
     Int_Arr* new_array = malloc(sizeof(Int_Arr));
     new_array->count = len;
     for (int i = 0; i < comp_count[0]; i++)
-	new_array->data[len-1-i] = min_val;
+        new_array->data[len-1-i] = min_val;
     for (int i = 1; i < NELEMS(comp_count); i++) {
-	for (int n = comp_count[i-1]; n < comp_count[i]; n++)
-	    new_array->data[len-1-n] = i + min_val;
+        for (int n = comp_count[i-1]; n < comp_count[i]; n++)
+            new_array->data[len-1-n] = i + min_val;
     }
     return new_array;
 }

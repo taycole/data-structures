@@ -68,26 +68,26 @@ BT_Node* bt_node_init(int val)
 void bt_add(BT* bt, int val)
 {
     if (bt->root == NULL) {
-	bt->root = bt_node_init(val);
-	return;
+        bt->root = bt_node_init(val);
+        return;
     }
 
     BT_Node *curr = bt->root, *parent;
 
     while (curr) {
-	parent = curr;
-	if (val < curr->key)
-	    curr = curr->left;
-	else
-	    curr = curr->right;
+        parent = curr;
+        if (val < curr->key)
+            curr = curr->left;
+        else
+            curr = curr->right;
     }
 
     BT_Node* new_node = bt_node_init(val);
 
     if (val < parent->key)
-	parent->left = new_node;
+        parent->left = new_node;
     else
-	parent->right = new_node;
+        parent->right = new_node;
 }
 
 /**
@@ -97,13 +97,13 @@ void bt_remove_no_subtrees(BT* bt, BT_Node* r_parent, BT_Node* r_node)
 {
     // Is the root with no children
     if (r_parent == NULL)
-	bt->root = NULL;
+        bt->root = NULL;
     // Remove node is to the left
     else if (r_node->key < r_parent->key)
-	r_parent->left = NULL;
+        r_parent->left = NULL;
     // Remove node is to the right
     else
-	r_parent->right = NULL;
+        r_parent->right = NULL;
 
     free(r_node);
 }
@@ -116,17 +116,17 @@ void bt_remove_one_subtree(BT* bt, BT_Node* r_parent, BT_Node* r_node)
     // Determine which child
     BT_Node* child;
     if (r_node->left == NULL)
-	child = r_node->right;
+        child = r_node->right;
     else
-	child = r_node->left;
+        child = r_node->left;
 
     // Replace node to be removed with its child
     if (r_parent == NULL)
-	bt->root = child;
+        bt->root = child;
     else if (r_node->key < r_parent->key)
-	r_parent->left = child;
+        r_parent->left = child;
     else
-	r_parent->right = child;
+        r_parent->right = child;
 
     free(r_node);
 }
@@ -146,8 +146,8 @@ Inorder_S bt_find_inorder_successor(BT_Node* node)
 
     // Iterate until the leftmost node
     while (successor->left != NULL) {
-	successor_parent = successor;
-	successor = successor->left;
+        successor_parent = successor;
+        successor = successor->left;
     }
     return (Inorder_S){.parent = successor_parent, .successor = successor};
 }
@@ -162,16 +162,16 @@ void bt_remove_two_subtrees(BT* bt, BT_Node* r_parent, BT_Node* r_node)
 
     s.successor->left = r_node->left;
     if (s.successor != r_node->right) {
-	s.parent->left = s.successor->right;
-	s.successor->right = r_node->right;
+        s.parent->left = s.successor->right;
+        s.successor->right = r_node->right;
     }
     // Update removed node's parent to point to new node. If root, set as root.
     if (r_parent == NULL)
-	bt->root = s.successor;
+        bt->root = s.successor;
     else if (r_node->key < r_parent->key)
-	r_parent->left = s.successor;
+        r_parent->left = s.successor;
     else
-	r_parent->right = s.successor;
+        r_parent->right = s.successor;
 
     free(r_node);
 }
@@ -183,25 +183,25 @@ bool bt_remove(BT* bt, int val)
 {
     BT_Node *parent = NULL, *curr_node = bt->root;
     while (curr_node && curr_node->key != val) {
-	parent = curr_node;
-	if (val < curr_node->key)
-	    curr_node = curr_node->left;
-	else
-	    curr_node = curr_node->right;
+        parent = curr_node;
+        if (val < curr_node->key)
+            curr_node = curr_node->left;
+        else
+            curr_node = curr_node->right;
     }
     // Search failed
     if (curr_node == NULL)
-	return false;
+        return false;
 
     // Node has both children, calls helper function to remove two subtrees
     else if (curr_node->left != NULL && curr_node->right != NULL)
-	bt_remove_two_subtrees(bt, parent, curr_node);
+        bt_remove_two_subtrees(bt, parent, curr_node);
     // Node has one child, call helper to remove one subtree
     else if (curr_node->left != NULL || curr_node->right != NULL)
-	bt_remove_one_subtree(bt, parent, curr_node);
+        bt_remove_one_subtree(bt, parent, curr_node);
     // Node is a leaf, call helper to remove with no subtrees
     else
-	bt_remove_no_subtrees(bt, parent, curr_node);
+        bt_remove_no_subtrees(bt, parent, curr_node);
 
     return true;
 }
@@ -214,12 +214,12 @@ bool bt_contains(BT* bt, int key)
 {
     BT_Node* curr = bt->root;
     while (curr) {
-	if (key == curr->key)
-	    return true;
-	else if (key < curr->key)
-	    curr = curr->left;
-	else
-	    curr = curr->right;
+        if (key == curr->key)
+            return true;
+        else if (key < curr->key)
+            curr = curr->left;
+        else
+            curr = curr->right;
     }
     return false;
 }
@@ -230,25 +230,25 @@ bool bt_contains(BT* bt, int key)
 void bt_rec_traverse(BT_Node* node, int mode, Int_Queue_DA* q)
 {
     if (mode == NLR) {
-	if (node) {
-	    da_enqueue(q, node->key);
-	    bt_rec_traverse(node->left, mode, q);
-	    bt_rec_traverse(node->right, mode, q);
-	}
+        if (node) {
+            da_enqueue(q, node->key);
+            bt_rec_traverse(node->left, mode, q);
+            bt_rec_traverse(node->right, mode, q);
+        }
     }
     else if (mode == LNR) {
-	if (node) {
-	    bt_rec_traverse(node->left, mode, q);
-	    da_enqueue(q, node->key);
-	    bt_rec_traverse(node->right, mode, q);
-	}
+        if (node) {
+            bt_rec_traverse(node->left, mode, q);
+            da_enqueue(q, node->key);
+            bt_rec_traverse(node->right, mode, q);
+        }
     }
     else if (mode == LRN) {
-	if (node) {
-	    bt_rec_traverse(node->left, mode, q);
-	    bt_rec_traverse(node->right, mode, q);
+        if (node) {
+            bt_rec_traverse(node->left, mode, q);
+            bt_rec_traverse(node->right, mode, q);
             da_enqueue(q, node->key);
-	}
+        }
     }
 }
 
@@ -281,53 +281,53 @@ Int_Queue_DA* bt_iterative_traversal(BT* bt, int mode)
 
     // Preorder
     if (mode == NLR) {
-	if (bt->root) da_push(stack, bt->root);
-	while (stack->size != 0) {
-	    curr = da_pop(stack);
-	    da_enqueue(arr, curr->key);  // record node - inorder
-    	    if (curr->right) da_push(stack, curr->right);
-	    if (curr->left) da_push(stack, curr->left);
-	}
+        if (bt->root) da_push(stack, bt->root);
+        while (stack->size != 0) {
+            curr = da_pop(stack);
+            da_enqueue(arr, curr->key);  // record node - inorder
+            if (curr->right) da_push(stack, curr->right);
+            if (curr->left) da_push(stack, curr->left);
+        }
     }
     // Inorder
     else if (mode == LNR) {
         curr = bt->root;
-	while (stack->size != 0 || curr != NULL) {
-	    if (curr) {
-		da_push(stack, curr);
-		curr = curr->left;
-	    }
-	    // Enqueue on backtrack
-	    else {
-	        curr = da_pop(stack);
-		da_enqueue(arr, curr->key);
-		curr = curr->right;
-	    }
-	}
+        while (stack->size != 0 || curr != NULL) {
+            if (curr) {
+                da_push(stack, curr);
+                curr = curr->left;
+            }
+            // Enqueue on backtrack
+            else {
+                curr = da_pop(stack);
+                da_enqueue(arr, curr->key);
+                curr = curr->right;
+            }
+        }
     }
     // Post Order
     else if (mode == LRN) {
         curr = bt->root;
-	prev = NULL;
-	while (stack->size != 0 || curr != NULL) {
-	    if (curr) {
-		da_push(stack, curr);
-		curr = curr->left;
-	    }
-	    // Hit the end of left, try to go right
-	    else {
-		BT_Node* top = da_top(stack);
-		if (top->right != NULL && top->right != prev) {
-		    curr = top->right;
-		}
-		// Nothing to the right, visit then continue trying right from last
-		else {
-		    da_enqueue(arr, top->key);
-		    prev = top;
-		    da_pop(stack);
-		}
-	    }
-	}
+        prev = NULL;
+        while (stack->size != 0 || curr != NULL) {
+            if (curr) {
+                da_push(stack, curr);
+                curr = curr->left;
+            }
+            // Hit the end of left, try to go right
+            else {
+                BT_Node* top = da_top(stack);
+                if (top->right != NULL && top->right != prev) {
+                    curr = top->right;
+                }
+                // Nothing to the right, visit then continue trying right from last
+                else {
+                    da_enqueue(arr, top->key);
+                    prev = top;
+                    da_pop(stack);
+                }
+            }
+        }
     }
     da_free(stack);
     return arr;
@@ -344,10 +344,10 @@ void bt_free(BT* bt)
     if (bt->root) da_push(stack, bt->root);
 
     while (stack->size != 0) {
-	curr = da_pop(stack);
-	if (curr->right) da_push(stack, curr->right);
-	if (curr->left) da_push(stack, curr->left);
-	free(curr);
+        curr = da_pop(stack);
+        if (curr->right) da_push(stack, curr->right);
+        if (curr->left) da_push(stack, curr->left);
+        free(curr);
     }
     da_free(stack);
     free(bt);
@@ -362,9 +362,9 @@ void bt_free(BT* bt)
 void rec_get_height(BT_Node* node, int curr_h, int* h)
 {
     if (node != NULL) {
-	rec_get_height(node->left, curr_h+1, h);
-	rec_get_height(node->right, curr_h+1, h);
-	*h = (curr_h > *h)? curr_h : *h;
+        rec_get_height(node->left, curr_h+1, h);
+        rec_get_height(node->right, curr_h+1, h);
+        *h = (curr_h > *h)? curr_h : *h;
     }
 }
 
@@ -388,11 +388,11 @@ int bt_get_width(BT* bt)
     da_enqueue(q, bt->root);
 
     while (q->size != 0) {
-	max_w = (q->size > max_w)? q->size : max_w;
-	BT_Node* node = da_dequeue(q);
+        max_w = (q->size > max_w)? q->size : max_w;
+        BT_Node* node = da_dequeue(q);
 
-	if (node->left) da_enqueue(q, node->left);
-	if (node->right) da_enqueue(q, node->right);
+        if (node->left) da_enqueue(q, node->left);
+        if (node->right) da_enqueue(q, node->right);
     }
     da_free(q);
     return max_w;
@@ -408,10 +408,10 @@ typedef struct Arr_2D {
 void rec_fill_matrix(BT_Node* node, Arr_2D* matrix, int row, int l_col, int r_col)
 {
     if (node) {
-	int mid_col = (l_col + r_col) / 2;
-	matrix->data[row][mid_col] = node->key;
-	rec_fill_matrix(node->left, matrix, row+1, l_col, mid_col-1);
-	rec_fill_matrix(node->right, matrix, row+1, mid_col+1, r_col);
+        int mid_col = (l_col + r_col) / 2;
+        matrix->data[row][mid_col] = node->key;
+        rec_fill_matrix(node->left, matrix, row+1, l_col, mid_col-1);
+        rec_fill_matrix(node->right, matrix, row+1, mid_col+1, r_col);
     }
 }
 
@@ -433,13 +433,13 @@ void bt_print(BT* bt)
     rec_fill_matrix(bt->root, matrix, 0, 0, w-1);
 
     for(int i = 0; i < h; i++) {
-	for (int j = 0; j < w; j++) {
-	    if (matrix->data[i][j])
-		printf("%02d ", matrix->data[i][j]);
-	    else
-		printf("-- ");
-	}
-	printf("\n");
+        for (int j = 0; j < w; j++) {
+            if (matrix->data[i][j])
+                printf("%02d ", matrix->data[i][j]);
+            else
+                printf("-- ");
+        }
+        printf("\n");
     }
     free(matrix);
 }

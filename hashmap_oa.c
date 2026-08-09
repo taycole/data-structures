@@ -16,8 +16,8 @@ int hash_function_1(char* s, int len)
 {
     int hash = 0;
     for (int i = 0; i < len; i++) {
-	char letter = *(s + i);
-	hash += (int)letter;
+        char letter = *(s + i);
+        hash += (int)letter;
     }
     return hash;
 }
@@ -29,8 +29,8 @@ int hash_function_2(char* s, int len)
 {
     int hash = 0;
     for (int i = 0; i < len; i++) {
-	char letter = *(s + i);
-	hash += (i + 1) * (int)letter;
+        char letter = *(s + i);
+        hash += (i + 1) * (int)letter;
     }
     return hash;
 }

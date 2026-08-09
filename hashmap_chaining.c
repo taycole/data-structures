@@ -21,6 +21,7 @@ typedef struct SLL {
     size_t size;
 } SLL;
 
+// Uses da_macros.c to make a dynamic array of SLL pointers
 typedef struct Buckets {
     size_t size;
     size_t capacity;
@@ -62,45 +63,45 @@ int main()
 
     // 35
     char* key_list[] = {
-	"Lorem",                  // 0
-	"ipsum",		  // 1
-	"dolor",		  // 2
-	"sit",			  // 3
-	"amet",			  // 4
-	"consectetur",		  // 5
-	"adipiscing",		  // 6
-	"elit",			  // 7
-	"Nam",			  // 8
-	"scelerisque",		  // 9
-	"purus",		  // 10
-	"sollicitudin",		  // 11
-	"lacinia",		  // 12
-	"ultrices",		  // 13
-	"lacus",		  // 14
-	"mi",			  // 15
-	"finibus",		  // 16
-	"ipsum",		  // 17 x2
-	"id",			  // 18
-	"cursus",		  // 19
-	"nunc",			  // 20
-	"Lorem",		  // 21 x2
-	"et",			  // 22
-	"diam",			  // 23
-	"Donec",		  // 24
-	"nisl",			  // 25
-	"libero",		  // 26
-	"bibendum",		  // 27
-	"sit",			  // 28 x2
-	"amet",			  // 29 x2
-	"vehicula",		  // 30
-	"eget",			  // 31
-	"commodo",		  // 32
-	"ac",			  // 33
-	"sem",			  // 34
+        "Lorem",                  // 0
+        "ipsum",                  // 1
+        "dolor",                  // 2
+        "sit",                    // 3
+        "amet",                   // 4
+        "consectetur",            // 5
+        "adipiscing",             // 6
+        "elit",                   // 7
+        "Nam",                    // 8
+        "scelerisque",            // 9
+        "purus",                  // 10
+        "sollicitudin",           // 11
+        "lacinia",                // 12
+        "ultrices",               // 13
+        "lacus",                  // 14
+        "mi",                     // 15
+        "finibus",                // 16
+        "ipsum",                  // 17 x2
+        "id",                     // 18
+        "cursus",                 // 19
+        "nunc",                   // 20
+        "Lorem",                  // 21 x2
+        "et",                     // 22
+        "diam",                   // 23
+        "Donec",                  // 24
+        "nisl",                   // 25
+        "libero",                 // 26
+        "bibendum",               // 27
+        "sit",                    // 28 x2
+        "amet",                   // 29 x2
+        "vehicula",               // 30
+        "eget",                   // 31
+        "commodo",                // 32
+        "ac",                     // 33
+        "sem",                    // 34
     };
 
     for (int i = 0; i < 35; i++) {
-	map_mc_put(test, key_list[i], i);
+        map_mc_put(test, key_list[i], i);
     }
 
     map_mc_test_print(test);
@@ -121,13 +122,16 @@ int main()
     printf("Map contains key %s: %d\n", "amet", map_mc_contains_key(test, "amet"));
 
     for (int i = 0; i < 35; i++) {
-	map_mc_put(test, key_list[i], i);
+        map_mc_put(test, key_list[i], i);
     }
     map_mc_test_print(test);
     printf("\n\nNumber of empty buckets: %d\n\n", map_mc_empty_buckets(test));
     printf("Get test - key: %s, val: %d\n\n", "Lorem", map_mc_get(test, "Lorem"));
     printf("Map contains key %s: %d\n", "Lorem", map_mc_contains_key(test, "Lorem"));
     printf("Map contains key %s: %d\n", "dog", map_mc_contains_key(test, "dog"));
+
+    printf("Testing removing one by one:\n");
+
 
     map_mc_free(test);
 
@@ -160,17 +164,17 @@ bool sll_remove(SLL* sll, const char* key)
     SLL_Node* curr = sll->head;
 
     while (curr) {
-	if (!strcmp(curr->key, key)) {
-	    if (prev)
-		prev->next = curr->next;
-	    else
-		sll->head = curr->next;
-	    sll->size--;
-	    free(curr);             // Check if this is working, may not free all
-	    return true;
-	}
-	prev = curr;
-	curr = curr->next;
+        if (!strcmp(curr->key, key)) {
+            if (prev)
+                prev->next = curr->next;
+            else
+                sll->head = curr->next;
+            sll->size--;
+            free(curr);             // Check if this is working, may not free all
+            return true;
+        }
+        prev = curr;
+        curr = curr->next;
     }
     return false;
 }
@@ -179,9 +183,9 @@ void sll_free(SLL* sll)
 {
     SLL_Node* curr = sll->head;
     while (curr) {
-	SLL_Node* node = curr;
-	curr = curr->next;
-	free(node);
+        SLL_Node* node = curr;
+        curr = curr->next;
+        free(node);
     }
     free(sll);
 }
@@ -193,9 +197,9 @@ SLL_Node* sll_contains(SLL* sll, const char* key)
 {
     SLL_Node* curr = sll->head;
     while (curr) {
-	if (!strcmp(curr->key, key))
-	    return curr;
-	curr = curr->next;
+        if (!strcmp(curr->key, key))
+            return curr;
+        curr = curr->next;
     }
     return curr; // Will return tail NULL
 }
@@ -214,10 +218,10 @@ Map_MC* map_mc_init(int (*fptr)(const char*))
     map->hash_function = fptr;
 
     for (int i = 0; i < map->capacity; i++) {
-	SLL* bucket = malloc(sizeof(SLL));
-	bucket->head = NULL;
-	bucket->size = 0;
-	da_insert_at_index(map->buckets, i, bucket);
+        SLL* bucket = malloc(sizeof(SLL));
+        bucket->head = NULL;
+        bucket->size = 0;
+        da_insert_at_index(map->buckets, i, bucket);
     }
     return map;
 }
@@ -225,8 +229,8 @@ Map_MC* map_mc_init(int (*fptr)(const char*))
 void map_mc_free(Map_MC* map)
 {
     for (int i = 0; i < map->capacity; i++) {
-	SLL* bucket = map->buckets->data[i];
-	sll_free(bucket);
+        SLL* bucket = map->buckets->data[i];
+        sll_free(bucket);
     }
     da_free(map->buckets);
     free(map);
@@ -239,7 +243,7 @@ void map_mc_put(Map_MC* map, const char* key, int val)
 {
     // Resizes table if the load factor is overlimit
     if (map_mc_load(map) >= 1.0)
-	map_mc_resize(map, map->capacity * 2);
+        map_mc_resize(map, map->capacity * 2);
 
     // Calculates the index and gets the node at the correct bucket
     int hash_val = map->hash_function(key);
@@ -248,11 +252,11 @@ void map_mc_put(Map_MC* map, const char* key, int val)
 
     // If there isn't a node for the given key, add it, otherwise update
     if (bucket_node == NULL) {
-	sll_insert(map->buckets->data[index], key, val);
-	map->size++;
+        sll_insert(map->buckets->data[index], key, val);
+        map->size++;
     }
     else
-	bucket_node->value = val;
+        bucket_node->value = val;
 }
 
 /**
@@ -262,9 +266,9 @@ int map_mc_empty_buckets(Map_MC* map)
 {
     int count = 0;
     for (int i = 0; i < map->buckets->size; i++) {
-	SLL* bucket = map->buckets->data[i];
-	if (bucket->size == 0)
-	    count++;
+        SLL* bucket = map->buckets->data[i];
+        if (bucket->size == 0)
+            count++;
     }
     return count;
 }
@@ -278,10 +282,10 @@ int map_mc_get(Map_MC* map, const char* key)
     int index = hash_val % map->capacity;
     SLL_Node* node = sll_contains(map->buckets->data[index], key);
     if (node)
-	return node->value;
+        return node->value;
     else {
-	perror("key not found");
-	return -1;
+        perror("key not found");
+        return -1;
     }
 }
 
@@ -294,7 +298,7 @@ bool map_mc_contains_key(Map_MC* map, const char* key)
     int index = hash_val % map->capacity;
     SLL_Node* node = sll_contains(map->buckets->data[index], key);
     if (node)
-	return true;
+        return true;
 
     return false;
 }
@@ -309,7 +313,7 @@ void map_mc_remove(Map_MC* map, const char* key)
     bool result = sll_remove(map->buckets->data[index], key);
 
     if (result)
-	map->size--;
+        map->size--;
 }
 
 /**
@@ -319,15 +323,15 @@ void map_mc_clear(Map_MC* map)
 {
     Buckets* buckets = map->buckets;
     for (int i = 0; map->size > 0; i++) {
-	SLL* bucket = buckets->data[i];
-	if (bucket->size > 0) {
-	    map->size -= bucket->size;
-	    sll_free(bucket);
-	    SLL* new_bucket = malloc(sizeof(SLL));
-	    new_bucket->head = NULL;
-	    new_bucket->size = 0;
-	    buckets->data[i] = new_bucket;
-	}
+        SLL* bucket = buckets->data[i];
+        if (bucket->size > 0) {
+            map->size -= bucket->size;
+            sll_free(bucket);
+            SLL* new_bucket = malloc(sizeof(SLL));
+            new_bucket->head = NULL;
+            new_bucket->size = 0;
+            buckets->data[i] = new_bucket;
+        }
     }
 }
 
@@ -345,11 +349,11 @@ float map_mc_load(Map_MC* map)
 void map_mc_resize(Map_MC* map, int new_capacity)
 {
     if (new_capacity < 1)
-	return;
+        return;
 
     // Capacity not prime? find next closest prime
     if (!is_prime(new_capacity))
-	new_capacity = next_prime(new_capacity);
+        new_capacity = next_prime(new_capacity);
 
     Buckets* old_buckets = map->buckets;
     size_t old_size = map->size;
@@ -362,29 +366,29 @@ void map_mc_resize(Map_MC* map, int new_capacity)
 
     // Reinitialize bucket array with SLLs
     for (int i = 0; i < map->capacity; i++) {
-	SLL* bucket = malloc(sizeof(SLL));
-	bucket->head = NULL;
-	bucket->size = 0;
-	da_insert_at_index(map->buckets, i, bucket);
+        SLL* bucket = malloc(sizeof(SLL));
+        bucket->head = NULL;
+        bucket->size = 0;
+        da_insert_at_index(map->buckets, i, bucket);
     }
 
     // Copy values to new hash map
     int count = 0, bucket_i = 0;
     while (count < old_size) {
-	SLL* bucket_sll = old_buckets->data[bucket_i];
-	bucket_i++;
+        SLL* bucket_sll = old_buckets->data[bucket_i];
+        bucket_i++;
 
-	// For each bucket, iterate through nodes and remap/rehash
-	SLL_Node* curr = bucket_sll->head;
-	while (curr) {
-	    map_mc_put(map, curr->key, curr->value);
-	    curr = curr->next;
-	    count++;
-	}
+        // For each bucket, iterate through nodes and remap/rehash
+        SLL_Node* curr = bucket_sll->head;
+        while (curr) {
+            map_mc_put(map, curr->key, curr->value);
+            curr = curr->next;
+            count++;
+        }
     }
     for (int i = 0; i < old_capacity; i++) {
-	SLL* bucket = old_buckets->data[i];
-	sll_free(bucket);
+        SLL* bucket = old_buckets->data[i];
+        sll_free(bucket);
     }
     da_free(old_buckets); // Need to free linked lists as well, rewrite
 }
@@ -397,13 +401,13 @@ void map_mc_resize(Map_MC* map, int new_capacity)
 void map_mc_test_print(Map_MC* map)
 {
     for (int i = 0; i < map->capacity; i++) {
-	printf("%d: { ", i);
-	SLL_Node* bucket_curr = map->buckets->data[i]->head;
-	while (bucket_curr) {
-	    printf("%s : %d, ", bucket_curr->key, bucket_curr->value);
-	    bucket_curr = bucket_curr->next;
-	}
-	printf("}\n");
+        printf("%d: { ", i);
+        SLL_Node* bucket_curr = map->buckets->data[i]->head;
+        while (bucket_curr) {
+            printf("%s : %d, ", bucket_curr->key, bucket_curr->value);
+            bucket_curr = bucket_curr->next;
+        }
+        printf("}\n");
     }
 }
 
@@ -413,15 +417,15 @@ void map_mc_test_print(Map_MC* map)
 bool is_prime(int num)
 {
     if (num == 2 || num == 3)
-	return true;
+        return true;
     if (num == 1 || num % 2 == 0)
-	return false;
+        return false;
 
     int f = 3;
     while (pow(f, 2) <= num) {
-	if (num % f == 0)
-	    return false;
-	f += 2;
+        if (num % f == 0)
+            return false;
+        f += 2;
     }
     return true;
 }
@@ -432,10 +436,10 @@ bool is_prime(int num)
 int next_prime(int num)
 {
     if (num % 2 == 0)
-	num += 1;
+        num += 1;
 
     while (!is_prime(num))
-	num += 2;
+        num += 2;
 
     return num;
 }
@@ -447,8 +451,8 @@ int hash_function_1(const char* key)
 {
     int hash = 0;
     for (int i = 0; i < strlen(key); i++) {
-	char letter = key[i];
-	hash += (int)letter;
+        char letter = key[i];
+        hash += (int)letter;
     }
     return hash;
 }
@@ -460,8 +464,8 @@ int hash_function_2(const char* key)
 {
     int hash = 0;
     for (int i = 0; i < strlen(key); i++) {
-	char letter = key[i];
-	hash += (i + 1) * (int)letter;
+        char letter = key[i];
+        hash += (i + 1) * (int)letter;
     }
     return hash;
 }

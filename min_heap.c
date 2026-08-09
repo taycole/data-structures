@@ -28,12 +28,12 @@ void heap_add(Int_DA* arr, int val)
 
     // Bubbles up values as needed, swapping with parent
     while (arr->data[p_index] > arr->data[cur_index]) {
-	int p_val = arr->data[p_index];
-	arr->data[p_index] = val;
-	arr->data[cur_index] = p_val;
+        int p_val = arr->data[p_index];
+        arr->data[p_index] = val;
+        arr->data[cur_index] = p_val;
 
-	cur_index = p_index;
-	p_index = (cur_index - 1) / 2;
+        cur_index = p_index;
+        p_index = (cur_index - 1) / 2;
     }
 }
 
@@ -49,26 +49,26 @@ void heap_percolate_down(Int_DA* arr, int p_index, int length)
     // Continues to the end so long as one of the child indices points to a
     // valid position and the child value is less than the parent
     while ((left_index < length && arr->data[p_index] > arr->data[left_index]) ||
-	   (right_index < length && arr->data[p_index] > arr->data[right_index])) {
+           (right_index < length && arr->data[p_index] > arr->data[right_index])) {
 
-	// If only one child, go that way, otherwise smallest child
-	int min_child;
-	if (right_index >= length)
-	    min_child = left_index;
-	else if (left_index >= length)
-	    min_child = right_index;
-	else if (arr->data[left_index] <= arr->data[right_index])
-	    min_child = left_index;
-	else
-	    min_child = right_index;
+        // If only one child, go that way, otherwise smallest child
+        int min_child;
+        if (right_index >= length)
+            min_child = left_index;
+        else if (left_index >= length)
+            min_child = right_index;
+        else if (arr->data[left_index] <= arr->data[right_index])
+            min_child = left_index;
+        else
+            min_child = right_index;
 
-	// Swaps parent value with the smaller child's value
-	int p_val = arr->data[p_index];
-	arr->data[p_index] = arr->data[min_child];
-	arr->data[min_child] = p_val;
+        // Swaps parent value with the smaller child's value
+        int p_val = arr->data[p_index];
+        arr->data[p_index] = arr->data[min_child];
+        arr->data[min_child] = p_val;
 
-	// Updates variables for next iteration from child's old position
-	p_index = min_child;
+        // Updates variables for next iteration from child's old position
+        p_index = min_child;
         left_index = 2 * p_index + 1;
         right_index = 2 * p_index + 2;
     }
@@ -80,8 +80,8 @@ void heap_percolate_down(Int_DA* arr, int p_index, int length)
 int heap_remove_min(Int_DA* arr)
 {
     if (arr->size == 0) {
-	perror("heap_remove_min: array empty");
-	exit(-1);
+        perror("heap_remove_min: array empty");
+        exit(-1);
     }
 
     int min = arr->data[0];
@@ -92,7 +92,7 @@ int heap_remove_min(Int_DA* arr)
 
     // Percolate down if array isn't empty
     if (arr->size != 0)
-	heap_percolate_down(arr, 0, arr->size);
+        heap_percolate_down(arr, 0, arr->size);
 
     return min;
 }
@@ -105,7 +105,7 @@ void heapify(Int_DA* arr)
     // Start from first non-leaf element and move up the tree, percolating down
     // as needed
     for (int cur_index = arr->size / 2 - 1; cur_index >= 0; cur_index--)
-	heap_percolate_down(arr, cur_index, arr->size);
+        heap_percolate_down(arr, cur_index, arr->size);
 }
 
 /**
@@ -118,10 +118,10 @@ void heapsort(Int_DA* arr)
 
     // Swaps last element with the first and percolates down to heap length
     for (int heap_len = arr->size; heap_len > 1; heap_len--) {
-	int root_val = arr->data[0];
-	arr->data[0] = arr->data[heap_len-1];
-	arr->data[heap_len-1] = root_val;
-	heap_percolate_down(arr, 0, heap_len-1);
+        int root_val = arr->data[0];
+        arr->data[0] = arr->data[heap_len-1];
+        arr->data[heap_len-1] = root_val;
+        heap_percolate_down(arr, 0, heap_len-1);
     }
 }
 
@@ -133,10 +133,10 @@ void heapsort(Int_DA* arr)
 void rec_fill_matrix(Int_DA* node, int index, Arr_2D* matrix, int row, int l_col, int r_col)
 {
     if (index < node->size) {
-	int mid_col = (l_col + r_col) / 2;
-	matrix->data[row][mid_col] = node->data[index];
-	rec_fill_matrix(node, (2*index + 1), matrix, row+1, l_col, mid_col-1);
-	rec_fill_matrix(node, (2*index + 2), matrix, row+1, mid_col+1, r_col);
+        int mid_col = (l_col + r_col) / 2;
+        matrix->data[row][mid_col] = node->data[index];
+        rec_fill_matrix(node, (2*index + 1), matrix, row+1, l_col, mid_col-1);
+        rec_fill_matrix(node, (2*index + 2), matrix, row+1, mid_col+1, r_col);
     }
 }
 
@@ -158,13 +158,13 @@ void heap_print(Int_DA* arr)
 
     // Print matrix
     for(int i = 0; i < h; i++) {
-	for (int j = 0; j < w; j++) {
-	    if (matrix.data[i][j])
-		printf("%02d ", matrix.data[i][j]);
-	    else
-		printf("-- ");
-	}
-	printf("\n");
+        for (int j = 0; j < w; j++) {
+            if (matrix.data[i][j])
+                printf("%02d ", matrix.data[i][j]);
+            else
+                printf("-- ");
+        }
+        printf("\n");
     }
 }
 

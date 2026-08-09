@@ -44,7 +44,7 @@ void da_print(Int_DA* arr)
 {
     printf("DA ARR Length: %zu, Capacity: %zu: Data: ", arr->size, arr->capacity);
     for (int i = 0; i < arr->size; i++) {
-	printf("%d ", arr->data[i]);
+        printf("%d ", arr->data[i]);
     }
     printf("\n");
 }
@@ -56,7 +56,7 @@ void da_resize(Int_DA* arr, int new_capacity)
 {
     // Must be a positive integer greater than current size
     if (new_capacity <= 0 || new_capacity < arr->size) {
-	return;
+        return;
     }
 
     arr->data = realloc(arr->data, new_capacity * sizeof(*arr->data));
@@ -69,7 +69,7 @@ void da_resize(Int_DA* arr, int new_capacity)
 void da_append(Int_DA* arr, int val)
 {
     if (arr->size == arr->capacity)
-	da_resize(arr, arr->capacity * 2);
+        da_resize(arr, arr->capacity * 2);
 
     arr->data[arr->size++] = val;
 }
@@ -83,7 +83,7 @@ Int_DA* da_convert(int* arr, size_t len)
 
     // Copy values
     for (int i = 0; i < len; i++) {
-	da_append(da_arr, arr[i]);
+        da_append(da_arr, arr[i]);
     }
     return da_arr;
 }
@@ -95,15 +95,15 @@ void da_insert_at_index(Int_DA* arr, int index, int val)
 {
     // Bounds check
     if (index < 0 || index > arr->size)
-	return;
+        return;
 
     // If at capacity
     if (arr->size == arr->capacity)
-	da_resize(arr, arr->capacity * 2);
+        da_resize(arr, arr->capacity * 2);
 
     // Shift values to the right at insert location
     for (int i = arr->size; i > index; i--) {
-	arr->data[i] = arr->data[i-1];
+        arr->data[i] = arr->data[i-1];
     }
     arr->data[index] = val;
     arr->size++;
@@ -116,25 +116,25 @@ void da_remove_at_index(Int_DA* arr, int index)
 {
     // Bounds check
     if (index < 0 || index > arr->size)
-	return;
+        return;
 
     // Shrinks array if size less than 1/4 capacity
     if (arr->capacity / 4 > arr->size) {
         // If size less than 5, defaults to 10 capacity
-	if (arr->size < 5 && arr->capacity > 10)
-	    da_resize(arr, 10);
-	else
-	    da_resize(arr, arr->size * 2);
+        if (arr->size < 5 && arr->capacity > 10)
+            da_resize(arr, 10);
+        else
+            da_resize(arr, arr->size * 2);
     }
     // If only one element, remove it and return
     if (arr->size == 1) {
-	arr->size--;
-	return;
+        arr->size--;
+        return;
     }
 
     // Remove value by shifting to the left and overriding
     for (int i = index; i < arr->size - 1; i++)
-	arr->data[i] = arr->data[i+1];
+        arr->data[i] = arr->data[i+1];
 
     arr->size--;
 }
@@ -157,13 +157,13 @@ Int_DA* da_slice(Int_DA* arr, int start, int size)
 {
     // Bounds check
     if ((start < 0 || start >= arr->size) ||
-	(size < 0 || size > arr->size - start))
-	return NULL;
+        (size < 0 || size > arr->size - start))
+        return NULL;
 
     Int_DA* new_arr = da_init();
 
     for (int i = 0; i < size; i++)
-	da_insert_at_index(new_arr, i, arr->data[start+i]);
+        da_insert_at_index(new_arr, i, arr->data[start+i]);
 
     return new_arr;
 }
@@ -183,7 +183,7 @@ Int_DA* da_map(Int_DA* arr, int (*func)(int))
 {
     Int_DA* new_arr = da_init();
     for (int i = 0; i < arr->size; i++)
-	da_append(new_arr, func(arr->data[i]));
+        da_append(new_arr, func(arr->data[i]));
 
     return new_arr;
 }
@@ -195,8 +195,8 @@ Int_DA* da_filter(Int_DA* arr, bool (*func)(int))
 {
     Int_DA* new_arr = da_init();
     for (int i = 0; i < arr->size; i++) {
-	if (func(arr->data[i]) == true)
-	    da_append(new_arr, arr->data[i]);
+        if (func(arr->data[i]) == true)
+            da_append(new_arr, arr->data[i]);
     }
     return new_arr;
 }
@@ -217,8 +217,8 @@ void da_push(Int_DA* arr, int val)
 int da_pop(Int_DA* arr)
 {
     if (arr->size == 0) {
-	perror("da_pop: no elements to pop");
-	exit(-1);
+        perror("da_pop: no elements to pop");
+        exit(-1);
     }
     int val = arr->data[arr->size-1];
     da_remove_at_index(arr, arr->size-1);
@@ -232,8 +232,8 @@ int da_pop(Int_DA* arr)
 int da_top(Int_DA* arr)
 {
     if (arr->size == 0) {
-	perror("da_top: no elements to look at");
-	exit(-1);
+        perror("da_top: no elements to look at");
+        exit(-1);
     }
     return arr->data[arr->size-1];
 }
@@ -254,8 +254,8 @@ void da_enqueue(Int_DA* arr, int val)
 int da_dequeue(Int_DA* arr)
 {
     if (arr->size == 0) {
-	perror("da_dequeue: no elements to dequeue");
-	exit(-1);
+        perror("da_dequeue: no elements to dequeue");
+        exit(-1);
     }
     int val = arr->data[0];
     da_remove_at_index(arr, 0);
@@ -268,8 +268,8 @@ int da_dequeue(Int_DA* arr)
 int da_peek(Int_DA* arr)
 {
     if (arr->size == 0) {
-	perror("da_peek: no elements to peek at");
-	exit(-1);
+        perror("da_peek: no elements to peek at");
+        exit(-1);
     }
     return arr->data[0];
 }

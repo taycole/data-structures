@@ -44,9 +44,9 @@ void sll_free(Int_Node* sll)
     Int_Node* next_node;
 
     while (sll) {
-	next_node = sll->next;
-	free(sll);
-	sll = next_node;
+        next_node = sll->next;
+        free(sll);
+        sll = next_node;
     }
 }
 
@@ -58,8 +58,8 @@ int sll_length(Int_Node* sll)
     int len = 0;
     Int_Node* node = sll->next;
     while (node) {
-	len++;
-	node = node->next;
+        len++;
+        node = node->next;
     }
     return len;
 }
@@ -93,16 +93,16 @@ void sll_insert_back(Int_Node* head, int val)
 int sll_insert_at_index(Int_Node* head, int index, int val)
 {
     if (index < 0) {
-	perror("index out of bounds");
-	return 1;
+        perror("index out of bounds");
+        return 1;
     }
     Int_Node* curr = head;
     for (int i = 0; i < index; i++) {
-	curr = curr->next;
-	if (curr == NULL) {
-	    perror("sll not long enough");
-	    return 1;
-	}
+        curr = curr->next;
+        if (curr == NULL) {
+            perror("sll not long enough");
+            return 1;
+        }
     }
     Int_Node* new_node = sll_new_node(val);
     new_node->next = curr->next;
@@ -117,16 +117,16 @@ int sll_insert_at_index(Int_Node* head, int index, int val)
 int sll_remove_at_index(Int_Node* head, int index)
 {
     if (index < 0 || head->next == NULL) {
-	perror("list not long enough");
-	return 1;
+        perror("list not long enough");
+        return 1;
     }
     Int_Node* curr = head;
     for (int i = 0; i < index; i++) {
-	curr = curr->next;
-	if (curr->next == NULL) {
-	    perror("index not found");
-	    return 1;
-	}
+        curr = curr->next;
+        if (curr->next == NULL) {
+            perror("index not found");
+            return 1;
+        }
     }
     Int_Node* rm_node = curr->next;
     curr->next = curr->next->next;   // Cut off the node
@@ -142,13 +142,13 @@ int sll_remove(Int_Node* head, int val)
     Int_Node* curr = head;
 
     while (curr->next) {
-	if (curr->next->value == val) {
-	    Int_Node* rm_node = curr->next;
-	    curr->next = curr->next->next;
-	    free(rm_node);
-	    return 0;
-	}
-	curr = curr->next;
+        if (curr->next->value == val) {
+            Int_Node* rm_node = curr->next;
+            curr->next = curr->next->next;
+            free(rm_node);
+            return 0;
+        }
+        curr = curr->next;
     }
     return 1;
 }
@@ -163,9 +163,9 @@ int sll_count(Int_Node* head, int val)
     Int_Node* curr = head->next;
 
     while (curr) {
-	if (curr->value == val)
-	    count++;
-	curr = curr->next;
+        if (curr->value == val)
+            count++;
+        curr = curr->next;
     }
     return count;
 }
@@ -179,9 +179,9 @@ bool sll_find(Int_Node* head, int val)
     Int_Node* curr = head->next;
 
     while (curr) {
-	if (curr->value == val)
-	    return true;
-	curr = curr->next;
+        if (curr->value == val)
+            return true;
+        curr = curr->next;
     }
     return false;
 }
@@ -192,31 +192,31 @@ bool sll_find(Int_Node* head, int val)
 Int_Node* sll_slice(Int_Node* head, int start, int size)
 {
     if (start < 0 || size < 0) {
-	perror("no");
-	return NULL;
+        perror("no");
+        return NULL;
     }
     Int_Node* curr = head;
 
     // Step to start point
     for(int i = 0; i < start + 1; i++) {
-	curr = curr->next;
-	if (curr == NULL) {
-	    perror("no");
-	    return NULL;
-	}
+        curr = curr->next;
+        if (curr == NULL) {
+            perror("no");
+            return NULL;
+        }
     }
 
     Int_Node* new_list = sll_init();
     Int_Node* new_list_node = new_list;
 
     for (int i = 0; i < size; i++) {
-	if (curr == NULL) {
-	    perror("out of bounds");
-	    return NULL;
-	}
-	new_list_node->next = sll_new_node(curr->value);
-	new_list_node = new_list_node->next;
-	curr = curr->next;
+        if (curr == NULL) {
+            perror("out of bounds");
+            return NULL;
+        }
+        new_list_node->next = sll_new_node(curr->value);
+        new_list_node = new_list_node->next;
+        curr = curr->next;
     }
     return new_list;
 }
@@ -230,8 +230,8 @@ void sll_print(Int_Node* head)
     printf("SLL: HEAD ");
 
     while (curr->next) {
-	printf("-> N(%d) ", curr->next->value);
-	curr = curr->next;
+        printf("-> N(%d) ", curr->next->value);
+        curr = curr->next;
     }
 }
 
