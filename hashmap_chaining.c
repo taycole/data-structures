@@ -46,9 +46,10 @@ void map_mc_put(Map_MC* map, const char* key, int val);
 int map_mc_empty_buckets(Map_MC* map);
 int map_mc_get(Map_MC* map, const char* key);
 void map_mc_remove(Map_MC* map, const char* key);
+void map_mc_clear(Map_MC* map);
 bool map_mc_contains_key(Map_MC* map, const char* key);
-void map_mc_test_print(Map_MC* map);
 
+void map_mc_test_print(Map_MC* map);
 bool is_prime(int num);
 int next_prime(int num);
 int hash_function_1(const char* key);
@@ -114,6 +115,19 @@ int main()
     map_mc_remove(test, "Lorem");
 
     printf("Map contains key %s: %d\n", "Lorem", map_mc_contains_key(test, "Lorem"));
+
+    printf("clearing map then reinserting\n\n");
+    map_mc_clear(test);
+    printf("Map contains key %s: %d\n", "amet", map_mc_contains_key(test, "amet"));
+
+    for (int i = 0; i < 35; i++) {
+	map_mc_put(test, key_list[i], i);
+    }
+    map_mc_test_print(test);
+    printf("\n\nNumber of empty buckets: %d\n\n", map_mc_empty_buckets(test));
+    printf("Get test - key: %s, val: %d\n\n", "Lorem", map_mc_get(test, "Lorem"));
+    printf("Map contains key %s: %d\n", "Lorem", map_mc_contains_key(test, "Lorem"));
+    printf("Map contains key %s: %d\n", "dog", map_mc_contains_key(test, "dog"));
 
     map_mc_free(test);
 
@@ -299,6 +313,25 @@ void map_mc_remove(Map_MC* map, const char* key)
 }
 
 /**
+ * Clears the contents of the hashmap. Capacity remains the same.
+ */
+void map_mc_clear(Map_MC* map)
+{
+    Buckets* buckets = map->buckets;
+    for (int i = 0; map->size > 0; i++) {
+	SLL* bucket = buckets->data[i];
+	if (bucket->size > 0) {
+	    map->size -= bucket->size;
+	    sll_free(bucket);
+	    SLL* new_bucket = malloc(sizeof(SLL));
+	    new_bucket->head = NULL;
+	    new_bucket->size = 0;
+	    buckets->data[i] = new_bucket;
+	}
+    }
+}
+
+/**
  * Calculates and returns the load of the table
  */
 float map_mc_load(Map_MC* map)
@@ -432,39 +465,3 @@ int hash_function_2(const char* key)
     }
     return hash;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
